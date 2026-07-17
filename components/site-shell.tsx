@@ -3,6 +3,7 @@ import { Phone, MessageCircle } from "@/components/icons";
 import { services, industries } from "@/lib/content";
 
 const navLinks = [
+  { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Services", href: "/services" },
   { label: "Industries", href: "/industries" },
