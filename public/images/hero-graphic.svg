@@ -1,0 +1,39 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="screenGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B1F3A" />
+      <stop offset="100%" stop-color="#146EF5" stop-opacity="0.8" />
+    </linearGradient>
+    <linearGradient id="windowGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00C2FF" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#146EF5" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <rect x="40" y="120" width="1120" height="620" rx="48" fill="#0F233E" />
+  <rect x="60" y="140" width="1080" height="560" rx="36" fill="url(#screenGradient)" />
+  <rect x="90" y="180" width="500" height="280" rx="24" fill="#102C4D" />
+  <rect x="100" y="200" width="460" height="40" rx="14" fill="#0C1D32" />
+  <rect x="100" y="260" width="320" height="24" rx="12" fill="#0C1D32" />
+  <rect x="100" y="300" width="220" height="24" rx="12" fill="#0C1D32" />
+  <rect x="100" y="360" width="260" height="24" rx="12" fill="#0C1D32" />
+  <rect x="630" y="180" width="420" height="330" rx="24" fill="#0C1D32" />
+  <circle cx="720" cy="260" r="26" fill="#00C2FF" fill-opacity="0.9" />
+  <rect x="690" y="330" width="120" height="18" rx="9" fill="#0C1D32" />
+  <rect x="690" y="360" width="260" height="18" rx="9" fill="#0C1D32" />
+  <path d="M690 410H930" stroke="#00C2FF" stroke-width="8" stroke-linecap="round" opacity="0.5" />
+  <path d="M690 450H840" stroke="#00C2FF" stroke-width="8" stroke-linecap="round" opacity="0.4" />
+  <path d="M690 490H780" stroke="#00C2FF" stroke-width="8" stroke-linecap="round" opacity="0.3" />
+  <rect x="120" y="470" width="300" height="150" rx="20" fill="#172B4E" />
+  <rect x="150" y="520" width="120" height="14" rx="7" fill="#00C2FF" />
+  <rect x="150" y="560" width="170" height="14" rx="7" fill="#0F346F" />
+  <rect x="150" y="600" width="80" height="14" rx="7" fill="#0F346F" />
+  <rect x="1020" y="520" width="70" height="280" rx="24" fill="#0C1D32" />
+  <rect x="1035" y="540" width="40" height="240" rx="14" fill="#146EF5" />
+  <rect x="80" y="700" width="1040" height="24" rx="12" fill="#102C4D" />
+  <path d="M140 720C160 710 190 710 210 720C230 730 260 730 280 720C300 710 330 710 350 720" stroke="#00C2FF" stroke-width="6" stroke-linecap="round" opacity="0.6" />
+  <circle cx="190" cy="190" r="16" fill="#FFFFFF" fill-opacity="0.8" />
+  <circle cx="350" cy="170" r="12" fill="#00C2FF" fill-opacity="0.9" />
+  <circle cx="960" cy="210" r="18" fill="#00C2FF" fill-opacity="0.6" />
+  <circle cx="860" cy="220" r="10" fill="#FFFFFF" fill-opacity="0.7" />
+  <ellipse cx="640" cy="640" rx="200" ry="80" fill="url(#windowGlow)" />
+</svg>

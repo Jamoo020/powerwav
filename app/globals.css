@@ -1,15 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #020617;
-  --foreground: #f8fafc;
+  --color-bg: #ffffff;
+  --color-surface: #f7f8fa;
+  --color-surface-strong: #0B1F3A;
+  --color-text: #1A1A1A;
+  --color-muted: #6B7280;
+  --color-border: #E5E7EB;
+  --color-primary: #146EF5;
+  --color-accent: #00C2FF;
+  --radius: 1.75rem;
+  --shadow-soft: 0 30px 80px rgba(11, 31, 58, 0.08);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
 }
 
 * {
@@ -22,16 +30,36 @@ html {
 
 body {
   margin: 0;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
 }
 
 a {
   text-decoration: none;
 }
 
+button,
+input,
+textarea {
+  font: inherit;
+}
+
 ::selection {
-  background: rgba(34, 211, 238, 0.35);
-  color: white;
+  background: rgba(0, 194, 255, 0.25);
+  color: #1A1A1A;
+}
+
+.heading-hero,
+.heading-large {
+  font-family: var(--font-heading), Space Grotesk, system-ui, sans-serif;
+}
+
+.shadow-glow {
+  box-shadow: var(--shadow-soft);
+}
+
+.bg-panel {
+  background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(247,248,250,1) 100%);
 }
