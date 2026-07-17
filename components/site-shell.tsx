@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import React, { useState } from "react";
 import { Phone, MessageCircle } from "@/components/icons";
 import { services, industries } from "@/lib/content";
 
@@ -14,14 +17,36 @@ const navLinks = [
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
       <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4 lg:px-8">
-          <Link href="/" className="flex items-center gap-3 text-base font-semibold tracking-[0.3em] uppercase text-slate-900">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-lg">PW</span>
-            PowerWave AV
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3 text-base font-semibold tracking-[0.3em] uppercase text-slate-900">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-lg">PW</span>
+              PowerWave AV
+            </Link>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-white p-2 text-slate-700 transition hover:bg-slate-100 md:hidden"
+            aria-expanded={menuOpen}
+            aria-label="Toggle navigation menu"
+          >
+            <span className="sr-only">Toggle navigation menu</span>
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              {menuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+
           <nav className="hidden items-center gap-6 text-sm text-slate-600 md:flex">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href} className="transition hover:text-slate-900">
@@ -29,6 +54,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
+
           <div className="flex items-center gap-3">
             <a href="tel:+254715825819" className="hidden rounded-full border border-[var(--color-border)] bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 md:inline-flex hover:bg-slate-100">
               Call Now
@@ -38,6 +64,26 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </a>
           </div>
         </div>
+
+        {menuOpen && (
+          <nav className="border-t border-[var(--color-border)] bg-white px-6 py-4 md:hidden">
+            <div className="space-y-3">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <a href="tel:+254715825819" className="block rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">
+                Call Now
+              </a>
+            </div>
+          </nav>
+        )}
       </header>
 
       <main>{children}</main>
