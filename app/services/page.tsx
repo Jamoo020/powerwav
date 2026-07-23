@@ -78,6 +78,18 @@ export default function ServicesPage() {
                       </motion.li>
                     ))}
                   </ul>
+                  <div className="mt-8 rounded-[1.75rem] border border-[var(--color-border)] bg-slate-50 p-5 text-sm leading-7 text-slate-600">
+                    <p className="font-semibold text-slate-950">Why this matters</p>
+                    <p className="mt-2">{service.why}</p>
+                  </div>
+                  <div className="mt-6 space-y-2 text-sm text-slate-600">
+                    {service.outcomes.map((outcome) => (
+                      <p key={outcome} className="flex items-start gap-2">
+                        <span className="mt-1 inline-flex h-2.5 w-2.5 rounded-full bg-[var(--color-primary)]" />
+                        {outcome}
+                      </p>
+                    ))}
+                  </div>
                   <p className="mt-8 text-sm leading-7 text-slate-500">{service.accent}</p>
                   <Link href="/contact" className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)] hover:text-[#105cda] transition-colors">
                     Request a tailored proposal <ArrowRight size={16} />

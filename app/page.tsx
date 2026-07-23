@@ -177,7 +177,7 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-6 pb-24 lg:px-8">
         <div className="grid gap-8 rounded-[2rem] border border-[var(--color-border)] bg-white p-8 shadow-sm lg:grid-cols-[1.1fr_0.9fr] lg:p-12">
           <div>
-            <SectionHeading eyebrow="FAQ" title="Answers to the questions that matter most" description="We help clients evaluate the right systems, budget, and support strategy from the outset." />
+            <SectionHeading eyebrow="FAQ" title="Answers to the questions that matter most" description="We help clients evaluate the right systems and support strategy from the outset." />
           </div>
           <div className="space-y-4">
             {faqs.slice(0, 4).map((faq) => (
@@ -197,7 +197,7 @@ export default function HomePage() {
             Let’s discuss your space, goals, and timeline. We’ll help you choose a system that supports your team, guests, and long-term operations.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link href="/contact" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 font-semibold text-white shadow-lg shadow-[rgba(20,110,245,0.15)] hover:bg-[#105cda]">Request a quote <ArrowRight size={18} /></Link>
+            <Link href="/contact" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 font-semibold text-white shadow-lg shadow-[rgba(20,110,245,0.15)] hover:bg-[#105cda]">Start a project <ArrowRight size={18} /></Link>
             <a href="https://wa.me/254715825819" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-6 py-3 font-semibold text-slate-900 hover:bg-slate-100">
               <MessageCircle size={18} /> Start WhatsApp chat
             </a>

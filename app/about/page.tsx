@@ -12,26 +12,32 @@ export default function AboutPage() {
             <p className="text-lg leading-8 text-[var(--color-muted)]">
               PowerWave AV brings together technical depth, elegant design, and practical support to create AV experiences that feel professional from the first consultation to the final handover.
             </p>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2">
-              {[
-                ["Mission", "Deliver dependable AV that helps organisations communicate with clarity and confidence."],
-                ["Vision", "Be Kenya’s trusted partner for premium, future-ready AV solutions."],
-              ].map(([title, text]) => (
-                <div key={title} className="rounded-[1.75rem] border border-[var(--color-border)] bg-slate-50 p-6">
-                  <p className="text-sm uppercase tracking-[0.3em] text-[var(--color-primary)]">{title}</p>
-                  <p className="mt-3 text-slate-700">{text}</p>
-                </div>
-              ))}
+            <div className="mt-10 space-y-6">
+              <div className="rounded-[1.75rem] border border-[var(--color-border)] bg-slate-50 p-6">
+                <p className="text-sm uppercase tracking-[0.3em] text-[var(--color-primary)]">Our approach</p>
+                <p className="mt-3 text-slate-700">We start with your goals and space, then design systems that deliver clarity, control, and an intuitive user experience. Every solution is purpose-built for the client’s operational needs.</p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {[
+                  ["Mission", "Deliver dependable AV that helps organisations communicate with clarity and confidence."],
+                  ["Vision", "Be Kenya’s trusted partner for premium, future-ready AV solutions."],
+                ].map(([title, text]) => (
+                  <div key={title} className="rounded-[1.75rem] border border-[var(--color-border)] bg-slate-50 p-6">
+                    <p className="text-sm uppercase tracking-[0.3em] text-[var(--color-primary)]">{title}</p>
+                    <p className="mt-3 text-slate-700">{text}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           <div className="rounded-[2rem] border border-[var(--color-primary)] bg-[#F7FAFF] p-10">
             <h3 className="text-2xl font-semibold text-slate-950">What sets us apart</h3>
             <ul className="mt-8 space-y-4 text-slate-700">
               {[
-                "Professional installation standards",
-                "Thoughtful design for hospitality, corporate, and education spaces",
-                "Responsive maintenance and after-sales care",
-                "Clear communication and project transparency",
+                "Detailed site surveys and thoughtful system designs",
+                "Clean installations with minimal disruption",
+                "Training and documentation for every handover",
+                "Responsive local support for service continuity",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3">
                   <ShieldCheck className="mt-1 text-[var(--color-primary)]" size={20} />
@@ -48,9 +54,9 @@ export default function AboutPage() {
           <h2 className="text-2xl font-semibold text-slate-950">Our commitment</h2>
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             {[
-              ["Quality", "Every deployment is designed to look polished, perform reliably, and remain easy to maintain."],
-              ["Support", "We stay involved after installation with maintenance, repairs, and technical assistance."],
-              ["Partnership", "We work closely with clients to create systems that grow with their business."],
+              ["Design Excellence", "We ensure every system is designed for your space, your people, and your workflows."],
+              ["Operational Reliability", "Our installations are built to perform with consistency over time."],
+              ["Future Ready", "We recommend upgrades and scalable systems that evolve with your business."],
             ].map(([title, text]) => (
               <div key={title} className="rounded-[1.75rem] border border-[var(--color-border)] bg-slate-50 p-8">
                 <p className="text-lg font-semibold text-slate-950">{title}</p>

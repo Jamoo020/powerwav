@@ -2,6 +2,8 @@ export type Service = {
   title: string;
   description: string;
   features: string[];
+  outcomes: string[];
+  why: string;
   href: string;
   accent: string;
 };
@@ -57,6 +59,12 @@ export const services: Service[] = [
     title: "Professional Sound Systems",
     description: "Crystal-clear audio for hospitality, worship, corporate events, and live experiences.",
     features: ["PA systems", "Restaurant audio", "Church audio", "DJ and live performance setups"],
+    outcomes: [
+      "Balanced room coverage with minimal feedback",
+      "Intuitive control for staff and presenters",
+      "Audio that feels consistent from front to back",
+    ],
+    why: "Sound is the foundation of every experience. We design systems that make speech, music, and announcements feel natural and impactful.",
     href: "/services",
     accent: "From intimate restaurants to expansive halls, every sound system is tuned for clarity and reliability.",
   },
@@ -64,6 +72,12 @@ export const services: Service[] = [
     title: "Video & Display Solutions",
     description: "High-impact visual display deployments for modern offices, conference spaces, and retail environments.",
     features: ["LED displays", "Video walls", "Projectors", "Interactive displays"],
+    outcomes: [
+      "Crisp, bright visuals in any lighting condition",
+      "Clean cable management and installation",
+      "Seamless integration with presentation and signage workflows",
+    ],
+    why: "Visual communication should be effortless. We pair hardware and control systems so every screen works exactly when you need it.",
     href: "/services",
     accent: "We design immersive visuals that strengthen communication and customer experience.",
   },
@@ -71,6 +85,12 @@ export const services: Service[] = [
     title: "Boardroom & Conference Systems",
     description: "Intelligent meeting rooms with crisp audio, seamless sharing, and polished collaboration experiences.",
     features: ["Wireless presentation", "PTZ cameras", "Meeting automation", "Ceiling speakers"],
+    outcomes: [
+      "Fast meeting start-up with one-touch controls",
+      "Consistent conferencing quality across devices",
+      "Professional room layouts that impress guests",
+    ],
+    why: "A great meeting room removes friction. We build systems that make hybrid collaboration feel easy and dependable.",
     href: "/services",
     accent: "Every deployment prioritizes usability, reliability, and executive-level presentation quality.",
   },
@@ -78,6 +98,12 @@ export const services: Service[] = [
     title: "CCTV & Security Integration",
     description: "Secure, scalable surveillance systems with proactive monitoring and dependable performance.",
     features: ["IP cameras", "DVR/NVR", "Remote monitoring", "Site security design"],
+    outcomes: [
+      "Clear coverage of critical zones",
+      "Remote access for managers and security teams",
+      "Expandable systems that grow with your site",
+    ],
+    why: "Security should be visible and manageable. We design CCTV systems that support fast decisions and operational confidence.",
     href: "/services",
     accent: "We protect people, assets, and operations with systems that are easy to manage.",
   },
@@ -85,6 +111,12 @@ export const services: Service[] = [
     title: "Maintenance & Support",
     description: "Long-term support that protects your investment and keeps systems performing at their best.",
     features: ["Preventive maintenance", "Repairs", "Calibration", "Upgrades"],
+    outcomes: [
+      "Longer service life for equipment",
+      "Fewer interruptions and faster fixes",
+      "A partner ready to plan future upgrades",
+    ],
+    why: "Installation is only the beginning. Our support services keep systems reliable and prepared for change.",
     href: "/maintenance",
     accent: "Our responsive support team helps clients stay operational and future-ready.",
   },

@@ -6,7 +6,7 @@ import { ArrowRight, MessageCircle, Phone, Mail, MapPin } from "@/components/ico
 import { SectionHeading } from "@/components/section-heading";
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", company: "", phone: "", email: "", service: "", budget: "", message: "" });
+  const [form, setForm] = useState({ name: "", company: "", phone: "", email: "", service: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<null | { ok: boolean; message: string }>(null);
 
@@ -19,7 +19,7 @@ export default function ContactPage() {
       const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
       const data = await res.json();
       setStatus({ ok: data.ok, message: data.message });
-      if (data.ok) setForm({ name: "", company: "", phone: "", email: "", service: "", budget: "", message: "" });
+      if (data.ok) setForm({ name: "", company: "", phone: "", email: "", service: "", message: "" });
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
@@ -66,7 +66,6 @@ export default function ContactPage() {
                 <label className="block text-sm text-slate-700"><span className="mb-2 block font-semibold">Email</span><input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="you@company.com" /></label>
               </div>
               <label className="mt-5 block text-sm text-slate-700"><span className="mb-2 block font-semibold">Service interested</span><input value={form.service} onChange={(e) => setForm({ ...form, service: e.target.value })} className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Boardroom, sound, CCTV, maintenance..." /></label>
-              <label className="mt-5 block text-sm text-slate-700"><span className="mb-2 block font-semibold">Budget</span><input value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Estimated budget" /></label>
               <label className="mt-5 block text-sm text-slate-700"><span className="mb-2 block font-semibold">Message</span><textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="min-h-36 w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Tell us about your project" /></label>
               <div className="mt-6 flex items-center gap-4">
                 <button type="submit" disabled={loading} className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#105cda]">

@@ -7,7 +7,6 @@ type Body = {
   phone?: string;
   email?: string;
   service?: string;
-  budget?: string;
   message?: string;
 };
 
@@ -43,7 +42,6 @@ export async function POST(request: Request) {
   <p><strong>Phone:</strong> ${body.phone || "-"}</p>
   <p><strong>Email:</strong> ${body.email || "-"}</p>
   <p><strong>Service:</strong> ${body.service || "-"}</p>
-  <p><strong>Budget:</strong> ${body.budget || "-"}</p>
   <p><strong>Message:</strong><br/>${(body.message || "-").replace(/\n/g, "<br/>")}</p>`;
 
   try {
