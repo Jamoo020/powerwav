@@ -136,7 +136,7 @@ export const projects: ProjectItem[] = [
     challenge: "The client needed a workspace that could support modern hybrid meetings without visual clutter.",
     solution: "PowerWave AV designed a refined room with ceiling speakers, wireless presentation, and a professional camera setup.",
     results: "The boardroom now supports productive collaboration and feels aligned with the organization’s brand.",
-    image: "/images/project-boardroom.svg",
+    image: "/images/project-boardroom.jpeg",
   },
   {
     title: "Hotel Sound & Display Rollout",
@@ -145,7 +145,7 @@ export const projects: ProjectItem[] = [
     challenge: "The hotel needed discreet, reliable AV that worked across public spaces and meeting zones.",
     solution: "We deployed distributed audio, LED signage, and centralized control for a polished guest experience.",
     results: "Guest communication became clearer and the property could host events more confidently.",
-    image: "/images/project-hotel.svg",
+    image: "/images/project-hotel.jpeg",
   },
   {
     title: "Retail Security & Display Deployment",
@@ -154,7 +154,7 @@ export const projects: ProjectItem[] = [
     challenge: "The business wanted stronger oversight without compromising the customer experience.",
     solution: "We delivered a layered CCTV design paired with digital displays that supported sales and communication.",
     results: "Operations became safer and the store environment felt more dynamic and controlled.",
-    image: "/images/project-security.svg",
+    image: "/images/project-security.jpeg",
   },
 ];
 

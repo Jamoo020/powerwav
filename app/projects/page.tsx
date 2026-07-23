@@ -35,6 +35,7 @@ export default function ProjectsPage() {
                 src={projects.find((project) => project.title === activeProject)?.image ?? "/images/hero-graphic.svg"}
                 alt={activeProject}
                 fill
+                unoptimized
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/15 to-transparent" />

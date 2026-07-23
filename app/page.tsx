@@ -47,7 +47,7 @@ export default function HomePage() {
             <div className="relative overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-white shadow-glow">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(0,194,255,0.15),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(20,110,245,0.16),_transparent_25%)]" />
               <div className="relative p-8 sm:p-10">
-                  <Image src="/images/hero-graphic.svg" alt="AV installation showcase" width={960} height={480} className="h-[480px] w-full rounded-[2rem] object-cover" />
+                  <Image src="/images/hero-graphic.jpeg" alt="AV installation showcase" width={960} height={480} unoptimized className="h-[480px] w-full rounded-[2rem] object-cover" />
               </div>
             </div>
           </motion.div>
@@ -137,6 +137,7 @@ export default function HomePage() {
                   src={project.image}
                   alt={project.title}
                   fill
+                  unoptimized
                   className="object-cover transition duration-500 hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" />
