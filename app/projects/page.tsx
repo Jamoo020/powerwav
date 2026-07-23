@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,8 +30,15 @@ export default function ProjectsPage() {
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-white shadow-sm">
-            <div className="relative h-56 bg-[radial-gradient(circle_at_top_left,_rgba(20,110,245,0.16),_transparent_40%),#0B1F3A] p-6">
-              <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.3em] text-white">
+            <div className="relative h-72 overflow-hidden">
+              <Image
+                src={projects.find((project) => project.title === activeProject)?.image ?? "/images/hero-graphic.svg"}
+                alt={activeProject}
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/15 to-transparent" />
+              <span className="absolute left-6 top-6 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.3em] text-white backdrop-blur">
                 {projects.find((project) => project.title === activeProject)?.category}
               </span>
             </div>

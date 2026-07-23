@@ -130,12 +130,22 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
         <SectionHeading eyebrow="Projects" title="Selected work shaped around real business needs" description="We create polished AV environments that elevate communication, security, and confidence." />
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
-          {projects.map((project) => (
+          {projects.map((project, index) => (
             <motion.article key={project.title} whileHover={{ scale: 1.02 }} className="overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-white shadow-sm">
-              <div className="h-44 bg-[radial-gradient(circle_at_top_left,_rgba(20,110,245,0.18),_transparent_30%),#0B1F3A]" />
+              <div className="relative h-56 overflow-hidden">
+                <Image
+                  src={project.image}
+                  alt={project.title}
+                  fill
+                  className="object-cover transition duration-500 hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" />
+                <span className="absolute left-4 top-4 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.3em] text-white backdrop-blur">
+                  {project.category}
+                </span>
+              </div>
               <div className="p-7">
-                <p className="text-sm uppercase tracking-[0.32em] text-[var(--color-primary)]">{project.category}</p>
-                <h3 className="mt-3 text-xl font-semibold text-slate-950">{project.title}</h3>
+                <h3 className="text-xl font-semibold text-slate-950">{project.title}</h3>
                 <p className="mt-4 text-sm leading-7 text-slate-600">{project.summary}</p>
                 <Link href="/projects" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)] hover:text-[#105cda]">
                   View case study <ArrowRight size={16} />
