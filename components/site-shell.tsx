@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Phone, MessageCircle } from "@/components/icons";
 import { services, industries } from "@/lib/content";
 
@@ -65,25 +66,39 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        {menuOpen && (
-          <nav className="border-t border-[var(--color-border)] bg-white px-6 py-4 md:hidden">
-            <div className="space-y-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <a href="tel:+254715825819" className="block rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">
-                Call Now
-              </a>
-            </div>
-          </nav>
-        )}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.nav
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden border-t border-[var(--color-border)] bg-white md:hidden"
+            >
+              <div className="space-y-2 px-6 py-4">
+                {navLinks.map((link, index) => (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.04 }}
+                  >
+                    <Link
+                      href={link.href}
+                      className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                ))}
+                <a href="tel:+254715825819" className="mt-2 block rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">
+                  Call Now
+                </a>
+              </div>
+            </motion.nav>
+          )}
+        </AnimatePresence>
       </header>
 
       <main>{children}</main>
