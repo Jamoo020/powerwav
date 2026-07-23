@@ -256,6 +256,30 @@ export const blogPosts: BlogPost[] = [
     image: "/images/blog-restaurant.svg",
     readTime: "7 min read",
   },
+  {
+    slug: "planning-hybrid-classrooms",
+    title: "Planning AV for Hybrid Classrooms",
+    excerpt: "How to design classroom audio-visual systems that support both in-person teaching and remote learning.",
+    category: "Education",
+    image: "/images/blog-classroom.svg",
+    readTime: "6 min read",
+  },
+  {
+    slug: "hospitality-audio-that-feels-effortless",
+    title: "Hospitality Audio That Feels Effortless",
+    excerpt: "Tips for creating background sound and announcements that enhance guest experience without distraction.",
+    category: "Hospitality",
+    image: "/images/blog-hospitality.svg",
+    readTime: "6 min read",
+  },
+  {
+    slug: "what-to-ask-about-cctv-and-access-control",
+    title: "What to Ask About CCTV and Access Control",
+    excerpt: "A simple checklist for choosing CCTV and security systems that protect people, property, and operations.",
+    category: "Security",
+    image: "/images/blog-security.svg",
+    readTime: "5 min read",
+  },
 ];
 
 export const locationPages: LocationPage[] = [
