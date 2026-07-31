@@ -10,9 +10,14 @@ const navLinks = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Services", href: "/services" },
-  { label: "Industries", href: "/industries" },
-  { label: "Projects", href: "/projects" },
-  { label: "Maintenance", href: "/maintenance" },
+  { label: "Solutions", href: "#", submenu: [
+    { label: "Corporate Boardrooms", href: "/solutions/corporate-boardrooms" },
+    { label: "Hotels & Hospitality", href: "/solutions/hotels-restaurants" },
+    { label: "Churches & Worship", href: "/solutions/churches-worship" },
+    { label: "Schools & Education", href: "/solutions/education-schools" },
+  ]},
+  { label: "Case Studies", href: "/projects/case-studies" },
+  { label: "Buyer Guides", href: "/resources/buyer-guides" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];
@@ -50,9 +55,20 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
           <nav className="hidden items-center gap-6 text-sm text-slate-600 md:flex">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="transition hover:text-slate-900">
-                {link.label}
-              </Link>
+              <div key={link.href} className="relative group">
+                <Link href={link.href} className="transition hover:text-slate-900">
+                  {link.label}
+                </Link>
+                {link.submenu && (
+                  <div className="absolute left-0 top-full mt-0 hidden min-w-max rounded-xl border border-[var(--color-border)] bg-white shadow-lg group-hover:block">
+                    {link.submenu.map((item) => (
+                      <Link key={item.href} href={item.href} className="block px-4 py-2 text-slate-700 hover:bg-slate-50 first:rounded-t-lg last:rounded-b-lg text-xs font-medium">
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </nav>
 

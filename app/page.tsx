@@ -40,14 +40,15 @@ export default function HomePage() {
               ))}
             </div>
           </motion.div>
-
-          <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9 }} className="relative flex items-center justify-center">
-            <div className="pointer-events-none absolute -right-16 top-12 h-64 w-64 rounded-full bg-[var(--color-accent)]/15 blur-3xl" />
-            <div className="pointer-events-none absolute left-12 bottom-0 h-72 w-72 rounded-full bg-[var(--color-primary)]/10 blur-3xl" />
-            <div className="relative overflow-hidden rounded-[2.5rem] border border-[var(--color-border)] bg-white shadow-glow">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(0,194,255,0.15),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(20,110,245,0.16),_transparent_25%)]" />
-              <div className="relative p-8 sm:p-10">
-                  <Image src="/images/hero-graphic.jpeg" alt="AV installation showcase" width={960} height={480} unoptimized className="h-[480px] w-full rounded-[2rem] object-cover" />
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.2 }} className="relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-br from-[var(--color-primary)] to-blue-600 rounded-[2rem] opacity-20 blur-xl"></div>
+            <div className="relative rounded-[2rem] bg-slate-900 p-8 text-white">
+              <h3 className="text-2xl font-semibold">Professional Audio Visual Solutions</h3>
+              <p className="mt-4 text-slate-300">Elevate your space with systems designed for clarity, reliability, and impact.</p>
+              <div className="mt-6 flex gap-4">
+                <Link href="/services" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-2 text-sm font-semibold text-white hover:bg-[#105cda]">
+                  Explore all services <ArrowRight size={16} />
+                </Link>
               </div>
             </div>
           </motion.div>
@@ -55,82 +56,38 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-        <SectionHeading eyebrow="Who we are" title="A premium AV partner for ambitious teams" description="We combine technical expertise, elegant deployment, and responsive support to deliver systems that feel effortless and perform reliably." />
-        <div className="mt-12 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="rounded-[2rem] border border-[var(--color-border)] bg-white p-10 shadow-sm">
-            <p className="text-lg leading-8 text-[var(--color-muted)]">
-              PowerWave AV exists to help businesses create clear communication experiences through carefully designed audio visual systems. From boardrooms to restaurants, our work bridges technology, design, and long-term support.
-            </p>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-[1.5rem] border border-[var(--color-border)] bg-slate-50 p-6">
-                <p className="text-sm uppercase tracking-[0.3em] text-[var(--color-primary)]">Mission</p>
-                <p className="mt-3 text-slate-700">Deliver dependable AV that helps organisations communicate with confidence.</p>
-              </div>
-              <div className="rounded-[1.5rem] border border-[var(--color-border)] bg-slate-50 p-6">
-                <p className="text-sm uppercase tracking-[0.3em] text-[var(--color-primary)]">Vision</p>
-                <p className="mt-3 text-slate-700">Be Kenya’s trusted partner for premium, future-ready audio visual solutions.</p>
-              </div>
-            </div>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="rounded-[2rem] border border-[var(--color-primary)] bg-[#F7FAFF] p-10">
-            <h3 className="text-2xl font-semibold text-slate-950">Why clients choose us</h3>
-            <ul className="mt-8 space-y-4 text-slate-700">
-              {[
-                "Professional installation standards",
-                "Premium equipment and clean design",
-                "Responsive maintenance and support",
-                "Clear communication from consultation to handover",
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <ShieldCheck className="mt-1 text-[var(--color-primary)]" size={20} />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <Link href="/about" className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)] hover:text-[#105cda]">
-              Learn more about our approach <ArrowRight size={16} />
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="bg-slate-50 py-20">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <SectionHeading eyebrow="Services" title="Solutions engineered for clarity, comfort, and control" description="From sound systems to meeting room automation, we design each solution around user experience and business outcomes." />
-          <div className="mt-12 grid gap-6 lg:grid-cols-3">
-            {services.map((service) => (
-              <motion.article whileHover={{ y: -6 }} transition={{ type: "spring", stiffness: 220, damping: 18 }} key={service.title} className="group overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-white shadow-sm">
-                <div className="relative overflow-hidden px-8 pt-8">
-                  <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-[var(--color-primary)]/10 blur-2xl" />
-                  <div className="relative inline-flex rounded-full border border-[var(--color-primary)]/25 bg-[var(--color-primary)]/10 px-4 py-2 text-sm font-semibold text-[var(--color-primary)]">
-                    {service.title}
-                  </div>
+        <SectionHeading eyebrow="Services" title="Complete solutions for every need" description="From boardrooms to security systems, we deliver integrated AV that works." />
+        <div className="mt-12 grid gap-6 lg:grid-cols-3">
+          {services.map((service) => (
+            <motion.article key={service.title} whileHover={{ y: -4 }} className="rounded-[2rem] border border-[var(--color-border)] bg-white p-8 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 rounded-full bg-[rgba(20,110,245,0.1)]">
+                  <ShieldCheck size={24} className="text-[var(--color-primary)]" />
                 </div>
-                <div className="px-8 pb-8 pt-6">
-                  <p className="text-lg leading-8 text-slate-700">{service.description}</p>
-                  <ul className="mt-6 space-y-3 text-sm text-slate-600">
-                    {service.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-3">
-                        <BadgeCheck size={16} className="text-[var(--color-primary)]" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="mt-6 text-sm leading-7 text-slate-500">{service.accent}</p>
-                  <Link href={service.href} className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)] hover:text-[#105cda]">
-                    Explore service <ArrowRight size={16} />
-                  </Link>
-                </div>
-              </motion.article>
-            ))}
-          </div>
+                <h3 className="text-lg font-semibold text-slate-950">{service.title}</h3>
+              </div>
+              <p className="text-sm leading-7 text-slate-600">{service.description}</p>
+              <ul className="mt-6 space-y-3 text-sm text-slate-600">
+                {service.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-3">
+                    <BadgeCheck size={16} className="text-[var(--color-primary)]" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-6 text-sm leading-7 text-slate-500">{service.accent}</p>
+              <Link href={service.href} className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)] hover:text-[#105cda]">
+                Explore service <ArrowRight size={16} />
+              </Link>
+            </motion.article>
+          ))}
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
         <SectionHeading eyebrow="Projects" title="Selected work shaped around real business needs" description="We create polished AV environments that elevate communication, security, and confidence." />
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
-          {projects.map((project, index) => (
+          {projects.map((project) => (
             <motion.article key={project.title} whileHover={{ scale: 1.02 }} className="overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-white shadow-sm">
               <div className="relative h-56 overflow-hidden">
                 <Image

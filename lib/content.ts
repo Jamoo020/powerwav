@@ -54,6 +54,42 @@ export type LocationPage = {
   intro: string;
 };
 
+export type VerticalLanding = {
+  slug: string;
+  vertical: string;
+  title: string;
+  description: string;
+  heroHeading: string;
+  heroSubheading: string;
+  challenges: Array<{
+    icon: string;
+    title: string;
+    description: string;
+  }>;
+  solutions: Array<{
+    icon: string;
+    title: string;
+    description: string;
+    features: string[];
+  }>;
+  keyBenefits: string[];
+  ctaHeading: string;
+  ctaSubheading: string;
+};
+
+export type BuyerGuide = {
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  sections: Array<{
+    heading: string;
+    content: string;
+  }>;
+  checklist: string[];
+  cta: string;
+};
+
 export const services: Service[] = [
   {
     title: "Professional Sound Systems",
@@ -294,3 +330,289 @@ export const locationPages: LocationPage[] = [
   { slug: "interactive-display-installation", title: "Interactive Display Installation", description: "Interactive display installations for education, training, and collaboration spaces.", keyword: "Interactive Display Installation", intro: "We provide interactive displays that improve engagement and align with modern teaching and presentation needs." },
   { slug: "video-conferencing-solutions-kenya", title: "Video Conferencing Solutions Kenya", description: "Video conferencing installations for modern offices, boardrooms, and hybrid work environments.", keyword: "Video Conferencing Solutions Kenya", intro: "Our conferencing systems are designed to make remote collaboration feel seamless and professional." },
 ];
+
+export const verticalLandings: VerticalLanding[] = [
+  {
+    slug: "av-solutions-hotels-restaurants",
+    vertical: "Hospitality",
+    title: "AV Solutions for Hotels & Restaurants",
+    description: "Deliver unforgettable guest experiences with premium audio, display, and conferencing systems tailored for hospitality venues.",
+    heroHeading: "Transform Guest Experience with Premium AV",
+    heroSubheading: "From elegant dining audio to high-impact event spaces, we design systems that elevate hospitality.",
+    challenges: [
+      {
+        icon: "volume-x",
+        title: "Poor Audio Quality",
+        description: "Inconsistent sound across dining rooms, lobbies, and event spaces affects guest comfort and satisfaction.",
+      },
+      {
+        icon: "wifi-off",
+        title: "Complex Event Management",
+        description: "Managing presentations, background audio, and announcements during events requires reliable automation.",
+      },
+      {
+        icon: "eye-off",
+        title: "Discreet Integration",
+        description: "Guests expect technology to enhance, not dominate. Visible cables and equipment damage aesthetic appeal.",
+      },
+    ],
+    solutions: [
+      {
+        icon: "volume-2",
+        title: "Distributed Audio Systems",
+        description: "Multi-zone sound that delivers consistent, restaurant-grade audio across all guest spaces.",
+        features: ["Zone-based volume control", "Remote management", "Background music integration", "Announcement capability"],
+      },
+      {
+        icon: "tv",
+        title: "LED Displays & Digital Signage",
+        description: "High-impact visual displays for wayfinding, promotions, and event announcements.",
+        features: ["24/7 content scheduling", "Easy content management", "Integration with booking systems", "Guest-facing displays"],
+      },
+      {
+        icon: "video",
+        title: "Event & Conference AV",
+        description: "Seamless AV solutions for boardrooms, banquet halls, and event spaces.",
+        features: ["Wireless presentation", "PTZ cameras for live streaming", "One-touch automation", "Professional lighting control"],
+      },
+    ],
+    keyBenefits: [
+      "Guest satisfaction increases with premium audio and visual experiences",
+      "Event management becomes faster and more professional",
+      "Clean, cable-free installations maintain venue aesthetics",
+      "Centralized control reduces staff training needs",
+      "Scalable systems grow with your business",
+    ],
+    ctaHeading: "Ready to elevate your hospitality venue?",
+    ctaSubheading: "Let's discuss a custom AV solution for your property.",
+  },
+  {
+    slug: "av-solutions-churches-worship",
+    vertical: "Worship",
+    title: "AV Solutions for Churches & Worship Spaces",
+    description: "Strengthen worship experiences with reliable sound systems, live streaming, and visual displays for congregations of any size.",
+    heroHeading: "Empower Worship with Professional Audio-Visual",
+    heroSubheading: "Crystal-clear sound, seamless streaming, and inspiring visuals for your ministry.",
+    challenges: [
+      {
+        icon: "volume-x",
+        title: "Poor Speech Intelligibility",
+        description: "Acoustical challenges in older or irregular spaces make sermons, announcements hard to understand.",
+      },
+      {
+        icon: "alert-circle",
+        title: "Feedback & Technical Issues",
+        description: "Unpredictable audio problems disrupt services and undermine confidence in your setup.",
+      },
+      {
+        icon: "globe",
+        title: "Limited Reach Beyond the Building",
+        description: "Sick or homebound members miss services; live streaming reaches broader audiences.",
+      },
+    ],
+    solutions: [
+      {
+        icon: "mic-2",
+        title: "House Sound Systems",
+        description: "Professionally tuned sound that delivers clarity from the pulpit to every pew.",
+        features: ["Wireless microphones", "Feedback prevention", "Adjustable zone control", "Simple operator interface"],
+      },
+      {
+        icon: "video",
+        title: "Live Streaming & Recording",
+        description: "Professional video capture and streaming for in-person and remote participation.",
+        features: ["HD camera and switcher", "Multi-platform streaming (YouTube, Facebook)", "Recording for archive", "On-screen graphics and lower thirds"],
+      },
+      {
+        icon: "tv",
+        title: "Visual Display Systems",
+        description: "Lyrics, scripture, and visual content that enhance worship and engagement.",
+        features: ["Large format projectors or LED screens", "Easy content scheduling", "Synchronized with music/sermon flow", "Accessible content management"],
+      },
+    ],
+    keyBenefits: [
+      "Congregants hear every word clearly, regardless of seating",
+      "Services reach members at home and beyond your physical location",
+      "Reduced technical interruptions build confidence and focus on worship",
+      "Volunteer operators quickly master simple interfaces",
+      "Professional presentation strengthens ministry credibility",
+    ],
+    ctaHeading: "Build a stronger worship experience.",
+    ctaSubheading: "Contact us for a consultation tailored to your congregation's needs.",
+  },
+  {
+    slug: "av-solutions-education-schools",
+    vertical: "Education",
+    title: "AV Solutions for Schools & Educational Institutions",
+    description: "Create engaging learning environments with interactive displays, classroom audio, and seamless hybrid teaching technology.",
+    heroHeading: "Modernize Learning with Smart AV",
+    heroSubheading: "Empower educators and engage students with interactive, reliable classroom technology.",
+    challenges: [
+      {
+        icon: "monitor-off",
+        title: "Outdated Classroom Tech",
+        description: "Old projectors, broken speakers, and disconnected equipment frustrate educators and limit engagement.",
+      },
+      {
+        icon: "users",
+        title: "Hybrid & Remote Teaching",
+        description: "Supporting in-person and remote students simultaneously requires professional video conferencing.",
+      },
+      {
+        icon: "alert-triangle",
+        title: "Maintenance & Support Gaps",
+        description: "Broken equipment goes unfixed; no clear vendor support leaves schools stranded.",
+      },
+    ],
+    solutions: [
+      {
+        icon: "grid-3x3",
+        title: "Interactive Displays",
+        description: "Touch-enabled displays that transform passive classrooms into collaborative learning spaces.",
+        features: ["Large format (65\"–86\")", "Touch and gesture recognition", "Interactive annotation tools", "Easy app integration"],
+      },
+      {
+        icon: "video",
+        title: "Hybrid Classroom Systems",
+        description: "Seamless capture and sharing of lessons to students on and off campus.",
+        features: ["Auto-tracking PTZ cameras", "Clear audio capture", "Screen sharing and student interaction", "Recording for review"],
+      },
+      {
+        icon: "wifi",
+        title: "Network & Security Integration",
+        description: "Robust, manageable systems designed for school IT environments and student safety.",
+        features: ["Managed connectivity", "Parental control options", "Data privacy compliance", "Centralized monitoring"],
+      },
+    ],
+    keyBenefits: [
+      "Students stay more engaged with modern, interactive learning tools",
+      "Teachers reduce prep time and focus on instruction",
+      "Hybrid teaching reaches all learners, regardless of attendance",
+      "Professional support ensures minimal downtime",
+      "Systems scale across multiple classrooms and campuses",
+    ],
+    ctaHeading: "Ready to upgrade your educational spaces?",
+    ctaSubheading: "Let's design a cohesive AV strategy for your school or institution.",
+  },
+];
+
+export const buyerGuides: BuyerGuide[] = [
+  {
+    slug: "corporate-video-conferencing-guide",
+    title: "Complete Guide to Corporate Video Conferencing Systems",
+    description: "A comprehensive guide for project managers and facilities leaders choosing video conferencing solutions for modern offices.",
+    category: "Boardrooms",
+    sections: [
+      {
+        heading: "Why Video Conferencing Matters for Corporate Spaces",
+        content: "Hybrid work is here to stay. A well-designed conferencing setup removes friction, improves participation, and creates professional meeting experiences that strengthen business relationships.",
+      },
+      {
+        heading: "Key Features to Look For",
+        content: "Look for systems offering: 4K camera quality, crystal-clear audio with echo cancellation, wireless content sharing, PTZ (pan-tilt-zoom) camera control, and integration with platforms like Zoom, Teams, and Google Meet.",
+      },
+      {
+        heading: "Room Size Matters",
+        content: "Small meeting rooms (4–6 people) need focused audio and a single camera. Mid-size conference rooms (8–20) require wider angle cameras and multi-zone audio. Large boardrooms (20+) need distributed systems with multiple cameras and presentation displays.",
+      },
+      {
+        heading: "Installation & Integration Considerations",
+        content: "Professional installation ensures seamless integration with your IT infrastructure, security protocols, and corporate aesthetics. Plan for cable management, power distribution, and network bandwidth.",
+      },
+      {
+        heading: "Budget Planning",
+        content: "Entry-level systems start around KES 300,000; mid-range systems run KES 600,000–1.5M; premium, fully automated boardrooms can exceed KES 2M. Consider ongoing support and upgrades.",
+      },
+    ],
+    checklist: [
+      "Define room size and typical meeting participant count",
+      "Choose camera type (fixed vs. PTZ, 1080p vs. 4K)",
+      "Select audio solution (table microphones, ceiling mics, soundbar)",
+      "Plan content sharing method (wireless, HDMI, network)",
+      "Review platform compatibility (Zoom, Teams, Cisco, etc.)",
+      "Assess IT infrastructure and network capacity",
+      "Budget for professional installation and cable management",
+      "Plan ongoing support and maintenance",
+    ],
+    cta: "Request a consultation to design the perfect conferencing setup for your boardroom.",
+  },
+  {
+    slug: "restaurant-sound-system-buyers-guide",
+    title: "A Venue Owner's Guide to Commercial Restaurant Sound Systems",
+    description: "Learn how to choose a sound system that enhances ambience, supports operations, and delights your guests.",
+    category: "Hospitality",
+    sections: [
+      {
+        heading: "The Foundation: Why Sound Matters in Restaurants",
+        content: "Sound shapes the entire dining experience. Good audio sets the mood, enhances conversation, and creates an environment guests want to return to. Poor sound—crackling speakers, dead zones, jarring volume changes—damages your brand.",
+      },
+      {
+        heading: "Understanding Audio Zones",
+        content: "Restaurants work best with zone-based systems: dining room (background ambience), bar/lounge (slightly louder), entry/waiting area (welcoming), kitchen (communication). Each zone needs independent volume and content control.",
+      },
+      {
+        heading: "Key System Components",
+        content: "A professional restaurant system includes: source (streaming, FM radio, announcements), amplifier, ceiling speakers, volume control panels, and backup power. Avoid cheap consumer systems that lack durability and control.",
+      },
+      {
+        heading: "Content & Programming",
+        content: "Curate playlists by daypart: upbeat morning, casual lunch, ambient early dinner, energetic late evening. Consider integrating background music subscription services (Jukebox, Spotify for Business) or hiring a DJ.",
+      },
+      {
+        heading: "Installation Quality",
+        content: "Professional installation includes: acoustical assessment, speaker placement, hidden wiring, and proper calibration. Avoid surface-mounted speakers; concealed ceiling and wall systems maintain aesthetics.",
+      },
+    ],
+    checklist: [
+      "Assess restaurant layout and square footage",
+      "Identify acoustic challenges (hard surfaces, high ceilings, busy streets)",
+      "Determine number of audio zones needed",
+      "Choose music source (streaming service, DJ, radio)",
+      "Plan speaker placement (ceiling, walls, subwoofers)",
+      "Select control system (manual volume, app-based, touchpad)",
+      "Budget for professional installation (hidden wiring, calibration)",
+      "Arrange ongoing support and content management",
+    ],
+    cta: "Let's design a sound system that matches your restaurant's ambience and operational needs.",
+  },
+  {
+    slug: "choosing-commercial-av-installation-partner",
+    title: "How to Choose the Right Commercial AV Installation Partner",
+    description: "A practical guide for decision-makers selecting a reliable AV vendor for your organization.",
+    category: "General",
+    sections: [
+      {
+        heading: "Beyond Price: What Truly Matters",
+        content: "Cost is one factor, but reliability, expertise, responsiveness, and long-term support matter more. A cheap installation can become expensive when systems fail during critical moments.",
+      },
+      {
+        heading: "Evaluating Vendor Experience",
+        content: "Ask for case studies and references in your industry. A vendor experienced with hotels understands hospitality workflows. One skilled in corporate settings knows conferencing integration. Request specific examples of similar projects.",
+      },
+      {
+        heading: "Understanding the Full Scope",
+        content: "A complete proposal includes: site survey, system design, equipment specifications, installation timeline, cable management, training, and ongoing support. Avoid vendors who give quotes without visiting your space.",
+      },
+      {
+        heading: "Support & Maintenance Plans",
+        content: "Ask about response times, preventive maintenance schedules, spare parts availability, and upgrade paths. Good vendors treat support as part of the relationship, not an afterthought.",
+      },
+      {
+        heading: "Quality of Life: Usability & Training",
+        content: "The best system is useless if staff can't operate it. Look for vendors who design for ease of use, provide thorough training, and create simple reference guides.",
+      },
+    ],
+    checklist: [
+      "Request 3+ references in your industry",
+      "Review case studies and photos of completed projects",
+      "Verify certifications and partnerships (Crestron, Biamp, etc.)",
+      "Schedule a site survey and consultation",
+      "Request a detailed scope of work and timeline",
+      "Compare warranty and support options",
+      "Ask about staff training and documentation",
+      "Confirm ongoing maintenance and escalation procedures",
+    ],
+    cta: "Ready to partner with an AV expert? Contact us for a no-pressure consultation.",
+  },
+];
+
