@@ -8,6 +8,14 @@ import {
   ShieldCheck as ShieldCheckIcon,
   Mail as MailIcon,
   MapPin as MapPinIcon,
+  BookOpen as BookOpenIcon,
+  Download as DownloadIcon,
+  Play as PlayIcon,
+  X as XIcon,
+  CheckCircle as CheckCircleIcon,
+  AlertCircle as AlertCircleIcon,
+  Zap as ZapIcon,
+  Users as UsersIcon,
 } from "lucide-react";
 
 type IconProps = {
@@ -29,3 +37,11 @@ export const Sparkles = createIcon(SparklesIcon);
 export const ShieldCheck = createIcon(ShieldCheckIcon);
 export const Mail = createIcon(MailIcon);
 export const MapPin = createIcon(MapPinIcon);
+export const BookOpen = createIcon(BookOpenIcon);
+export const Download = createIcon(DownloadIcon);
+export const Play = createIcon(PlayIcon);
+export const X = createIcon(XIcon);
+export const CheckCircle = createIcon(CheckCircleIcon);
+export const AlertCircle = createIcon(AlertCircleIcon);
+export const Zap = createIcon(ZapIcon);
+export const Users = createIcon(UsersIcon);
