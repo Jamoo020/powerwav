@@ -11,14 +11,6 @@ export const metadata: Metadata = {
     description: "AV solutions tailored for specific industries and business needs",
     url: "/industries",
     type: "website",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "PowerWave AV Industry Solutions",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",

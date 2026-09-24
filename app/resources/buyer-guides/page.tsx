@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { ArrowRight, BookOpen, Download } from "@/components/icons";
+import { ArrowRight, BookOpen } from "@/components/icons";
 import { SectionHeading } from "@/components/section-heading";
 import { buyerGuides } from "@/lib/content";
 
@@ -94,21 +94,21 @@ export default function BuyerGuidesPage() {
         {/* Full Guides Section */}
         <div className="mt-20">
           <h2 className="text-2xl font-semibold text-slate-950">Download Full Guides</h2>
-          <p className="mt-2 text-slate-600">Get comprehensive PDFs delivered to your email.</p>
+          <p className="mt-2 text-slate-600">Need the full guide? Contact our team and we’ll help you get the information you need.</p>
 
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             {buyerGuides.map((guide) => (
               <div key={guide.slug} className="flex items-start gap-4 rounded-xl border border-[var(--color-border)] bg-white p-6">
-                <Download size={24} className="text-[var(--color-primary)] flex-shrink-0 mt-1" />
+                <BookOpen size={24} className="text-[var(--color-primary)] flex-shrink-0 mt-1" />
                 <div className="flex-1">
                   <h4 className="font-semibold text-slate-950">{guide.title}</h4>
                   <p className="mt-1 text-sm text-slate-600">{guide.sections.length} sections • {guide.checklist.length} checklist items</p>
-                  <a
-                    href={`/api/guides/${guide.slug}`}
+                  <Link
+                    href="/contact"
                     className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[var(--color-primary)] hover:text-[#105cda]"
                   >
-                    Download PDF <ArrowRight size={14} />
-                  </a>
+                    Request Guide <ArrowRight size={14} />
+                  </Link>
                 </div>
               </div>
             ))}

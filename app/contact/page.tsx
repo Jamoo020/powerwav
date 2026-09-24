@@ -12,6 +12,12 @@ export default function ContactPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      setStatus({ ok: false, message: "Please complete your name, email, and message." });
+      return;
+    }
+
     setLoading(true);
     setStatus(null);
 

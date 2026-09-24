@@ -3,6 +3,7 @@ import { Metadata } from "next";
 export const metadataBase = new URL("https://powerwaveav.com");
 
 export const siteMetadata: Metadata = {
+  applicationName: "PowerWave AV",
   title: {
     default: "PowerWave AV | Premium Audio Visual Solutions in Kenya",
     template: "%s | PowerWave AV",
@@ -23,5 +24,14 @@ export const siteMetadata: Metadata = {
     card: "summary_large_image",
     title: "PowerWave AV",
     description: "Premium AV systems for modern businesses in Kenya",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };

@@ -84,6 +84,20 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+        <div className="rounded-[2rem] border border-[var(--color-border)] bg-slate-50 p-8 text-center lg:p-10">
+          <SectionHeading
+            eyebrow="Industries"
+            title="AV solutions shaped around your industry"
+            description="From corporate boardrooms and hotels to restaurants, churches, and schools, we adapt each installation to the environment, audience, and operational goals."
+            align="center"
+          />
+          <Link href="/industries" className="mt-8 inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 font-semibold text-white shadow-lg shadow-[rgba(20,110,245,0.15)] hover:bg-[#105cda]">
+            Explore industries <ArrowRight size={18} />
+          </Link>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
         <SectionHeading eyebrow="Projects" title="Selected work shaped around real business needs" description="We create polished AV environments that elevate communication, security, and confidence." />
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
@@ -106,7 +120,7 @@ export default function HomePage() {
                 <h3 className="text-xl font-semibold text-slate-950">{project.title}</h3>
                 <p className="mt-4 text-sm leading-7 text-slate-600">{project.summary}</p>
                 <Link href="/projects" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)] hover:text-[#105cda]">
-                  View case study <ArrowRight size={16} />
+                  View project <ArrowRight size={16} />
                 </Link>
               </div>
             </motion.article>

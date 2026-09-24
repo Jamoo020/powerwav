@@ -44,19 +44,20 @@ export async function POST(request: Request) {
   <p><strong>Service:</strong> ${body.service || "-"}</p>
   <p><strong>Message:</strong><br/>${(body.message || "-").replace(/\n/g, "<br/>")}</p>`;
 
+  if (!transporter) {
+    return NextResponse.json(
+      { ok: false, message: "Contact service is temporarily unavailable. Please try again later." },
+      { status: 503 }
+    );
+  }
+
   try {
-    if (transporter) {
-      await transporter.sendMail({
-        from,
-        to: recipient,
-        subject,
-        html,
-      });
-    } else {
-      // No SMTP configured — log to server console so messages aren't lost during development
-      // eslint-disable-next-line no-console
-      console.log("[contact] incoming enquiry:", { to: recipient, from, subject, body });
-    }
+    await transporter.sendMail({
+      from,
+      to: recipient,
+      subject,
+      html,
+    });
 
     return NextResponse.json({ ok: true, message: "Enquiry received. Our team will be in touch shortly." });
   } catch (err) {
