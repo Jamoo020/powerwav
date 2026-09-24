@@ -2,17 +2,11 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle } from "@/components/icons";
+import { CheckCircle } from "@/components/icons";
 
 interface RoomAssessmentProps {
   title?: string;
   description?: string;
-}
-
-interface AssessmentResult {
-  score: number;
-  recommendation: string;
-  insights: string[];
 }
 
 export function RoomAssessmentQuestionnaire({ 
@@ -106,38 +100,6 @@ export function RoomAssessmentQuestionnaire({
   };
 
   const calculateResults = (finalResponses: Record<number, number>) => {
-    const totalScore = Object.values(finalResponses).reduce((a, b) => a + b, 0);
-    const maxScore = 18; // rough max based on question weights
-    const normalizedScore = Math.round((totalScore / maxScore) * 100);
-
-    let recommendation: string;
-    let insights: string[] = [];
-
-    if (normalizedScore < 30) {
-      recommendation = "Your space is working well! Minor optimization could enhance user experience.";
-      insights = [
-        "Consider a health check of existing systems",
-        "Explore upgrades for better control and ease of use",
-        "Plan for future scalability as your business grows",
-      ];
-    } else if (normalizedScore < 60) {
-      recommendation = "Your space would benefit from targeted AV improvements to address current pain points.";
-      insights = [
-        "Focus on speech clarity and audio coverage",
-        "Upgrade aging equipment or control systems",
-        "Consider adding remote access or streaming capability",
-        "Professional installation could solve operational frustrations",
-      ];
-    } else {
-      recommendation = "Your space would significantly benefit from a comprehensive AV upgrade or new installation.";
-      insights = [
-        "Address critical audio/video gaps impacting user experience",
-        "Implement professional systems designed for your use case",
-        "Explore automation and control for easier daily operation",
-        "Plan for future growth and changing technology needs",
-      ];
-    }
-
     setShowResults(true);
     setResponses(finalResponses);
   };
@@ -218,12 +180,12 @@ export function RoomAssessmentQuestionnaire({
             </div>
           ) : (
             <div className="mt-8 rounded-lg bg-green-50 p-4 text-sm text-green-900">
-              <p className="font-semibold">Thanks! We'll be in touch soon with tailored recommendations.</p>
+              <p className="font-semibold">Thanks! We&apos;ll be in touch soon with tailored recommendations.</p>
             </div>
           )}
 
           <p className="mt-6 text-center text-xs text-slate-500">
-            Your assessment data helps us provide personalized recommendations. We'll contact you within 24 hours.
+            Your assessment data helps us provide personalized recommendations. We&apos;ll contact you within 24 hours.
           </p>
         </motion.div>
       </div>

@@ -333,10 +333,12 @@ export const contentCalendarGuide = {
   ],
 };
 
-export default {
+const contentTemplates = {
   blogPostTemplate,
   linkedinTemplate,
   videoTemplate,
   emailTemplate,
   contentCalendarGuide,
 };
+
+export default contentTemplates;

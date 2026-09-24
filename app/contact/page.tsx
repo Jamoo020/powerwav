@@ -27,7 +27,6 @@ export default function ContactPage() {
       setStatus({ ok: data.ok, message: data.message });
       if (data.ok) setForm({ name: "", company: "", phone: "", email: "", service: "", message: "" });
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error(err);
       setStatus({ ok: false, message: "Network error" });
     } finally {

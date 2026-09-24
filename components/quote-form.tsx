@@ -120,7 +120,7 @@ export function QuoteForm({ vertical, onSubmit }: QuoteFormProps) {
     <form onSubmit={handleSubmit} className="rounded-[2rem] border border-[var(--color-border)] bg-white p-10 shadow-sm">
       <div className="mb-8">
         <h3 className="text-2xl font-semibold text-slate-950">Request a Free Quote</h3>
-        <p className="mt-2 text-sm text-slate-600">Step {step} of 3: Let's understand your needs</p>
+        <p className="mt-2 text-sm text-slate-600">Step {step} of 3: Let&apos;s understand your needs</p>
       </div>
 
       {step === 1 && (
@@ -307,7 +307,7 @@ export function QuoteForm({ vertical, onSubmit }: QuoteFormProps) {
 
           <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-900">
             <p className="font-semibold">What happens next?</p>
-            <p className="mt-2">We'll review your request within 24 hours and reach out with a tailored proposal and timeline.</p>
+            <p className="mt-2">We&apos;ll review your request within 24 hours and reach out with a tailored proposal and timeline.</p>
           </div>
 
           <div className="flex gap-4 pt-4">

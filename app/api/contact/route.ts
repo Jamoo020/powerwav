@@ -61,7 +61,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true, message: "Enquiry received. Our team will be in touch shortly." });
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error("[contact] send error", err);
     return NextResponse.json({ ok: false, message: "Failed to deliver enquiry." }, { status: 500 });
   }

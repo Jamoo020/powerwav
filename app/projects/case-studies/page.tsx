@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Play, X } from "@/components/icons";
+import { ArrowRight, Play } from "@/components/icons";
 import { SectionHeading } from "@/components/section-heading";
 
 interface CaseStudy {
@@ -289,7 +289,7 @@ export default function CaseStudiesPage() {
               {/* Testimonial */}
               {active.testimonial && (
                 <div className="rounded-xl border border-[var(--color-border)] bg-gradient-to-br from-slate-50 to-white p-6">
-                  <p className="text-sm italic leading-6 text-slate-700 mb-3">"{active.testimonial.quote}"</p>
+                  <p className="text-sm italic leading-6 text-slate-700 mb-3">&quot;{active.testimonial.quote}&quot;</p>
                   <p className="font-semibold text-slate-950 text-sm">{active.testimonial.name}</p>
                   <p className="text-xs text-slate-600">{active.testimonial.role}</p>
                 </div>
@@ -309,7 +309,7 @@ export default function CaseStudiesPage() {
         <div className="mt-20 rounded-[2rem] border border-[var(--color-border)] bg-gradient-to-r from-blue-50 to-indigo-50 p-12 text-center">
           <h3 className="text-2xl font-semibold text-slate-950">Ready to Transform Your Space?</h3>
           <p className="mt-3 text-slate-700">
-            Let's discuss how we can deliver similar results for your organization.
+            Let&apos;s discuss how we can deliver similar results for your organization.
           </p>
           <div className="mt-8 flex gap-4 justify-center">
             <Link

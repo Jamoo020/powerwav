@@ -19,7 +19,6 @@ export async function GET() {
     await transporter.verify();
     return NextResponse.json({ ok: true, smtp: { configured: true, reachable: true } });
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.warn("SMTP verify failed", err);
     return NextResponse.json({ ok: true, smtp: { configured: true, reachable: false } });
   }

@@ -160,7 +160,7 @@ export function VerticalSolutionPage({ slug }: VerticalSolutionPageProps) {
             <p className="mt-4 text-slate-600 leading-7">{vertical.ctaSubheading}</p>
             <div className="mt-8 space-y-4">
               <div>
-                <p className="text-sm font-semibold text-slate-950 mb-2">What's included in your consultation:</p>
+                <p className="text-sm font-semibold text-slate-950 mb-2">What&apos;s included in your consultation:</p>
                 <ul className="space-y-2 text-sm text-slate-600">
                   <li className="flex items-start gap-2">
                     <span className="text-[var(--color-primary)]">✓</span> Site assessment and needs analysis
