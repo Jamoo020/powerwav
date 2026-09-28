@@ -24,10 +24,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
       <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-white/95 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4 lg:px-8">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-3 text-base font-semibold tracking-[0.3em] uppercase text-slate-900">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-lg">PW</span>
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 lg:flex-nowrap lg:gap-4 xl:px-8">
+          <div className="flex shrink-0 items-center gap-3">
+            <Link href="/" className="flex items-center gap-2.5 whitespace-nowrap text-[15px] font-semibold tracking-[0.2em] uppercase text-slate-900">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm">PW</span>
               PowerWave AV
             </Link>
           </div>
@@ -35,7 +35,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-white p-2 text-slate-700 transition hover:bg-slate-100 md:hidden"
+            className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-white p-2 text-slate-700 transition hover:bg-slate-100 lg:hidden"
             aria-expanded={menuOpen}
             aria-label="Toggle navigation menu"
           >
@@ -49,19 +49,25 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </svg>
           </button>
 
-          <nav className="hidden items-center gap-6 text-sm text-slate-600 md:flex">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-x-2 text-[13px] text-slate-600 lg:flex xl:gap-x-3 2xl:gap-x-4">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="transition hover:text-slate-900">
+              <Link
+                key={link.href}
+                href={link.href}
+                className={link.label === "Shop"
+                  ? "whitespace-nowrap rounded-full bg-[var(--color-primary)]/10 px-3 py-2 font-semibold text-[var(--color-primary)] transition hover:bg-[var(--color-primary)]/15"
+                  : "whitespace-nowrap px-1 py-2 transition hover:text-slate-900"}
+              >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center gap-3">
-            <a href="tel:+254715825819" className="hidden rounded-full border border-[var(--color-border)] bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 md:inline-flex hover:bg-slate-100">
+          <div className="flex shrink-0 items-center gap-2">
+            <a href="tel:+254715825819" className="hidden rounded-full border border-[var(--color-border)] bg-slate-50 px-3 py-2 text-xs font-medium text-slate-900 hover:bg-slate-100 lg:inline-flex xl:px-4 xl:text-sm">
               Call Now
             </a>
-            <a href="https://wa.me/254715825819" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#105cda]">
+            <a href="https://wa.me/254715825819" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#105cda] xl:px-4 xl:text-sm">
               <MessageCircle size={16} /> WhatsApp
             </a>
           </div>
@@ -74,7 +80,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.25 }}
-              className="overflow-hidden border-t border-[var(--color-border)] bg-white md:hidden"
+              className="overflow-hidden border-t border-[var(--color-border)] bg-white lg:hidden"
             >
               <div className="space-y-2 px-6 py-4">
                 {navLinks.map((link, index) => (
