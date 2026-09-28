@@ -33,7 +33,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
-      <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-white/95 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-white/95 shadow-[0_2px_12px_rgba(11,31,58,0.04)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 lg:flex-nowrap lg:gap-4 xl:px-8">
           <div className="flex shrink-0 items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 whitespace-nowrap text-[15px] font-semibold tracking-[0.2em] uppercase text-slate-900">
@@ -45,7 +45,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-white p-2 text-slate-700 transition hover:bg-slate-100 lg:hidden"
+            className="inline-flex items-center rounded-xl border border-[var(--color-border)] bg-white p-2 text-slate-700 transition hover:bg-slate-100 lg:hidden"
             aria-expanded={menuOpen}
             aria-label="Toggle navigation menu"
           >
@@ -84,14 +84,14 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute left-0 top-full z-50 mt-2 w-48 rounded-xl border border-[var(--color-border)] bg-white p-1.5 shadow-lg"
+                      className="absolute left-0 top-full z-50 mt-2 w-52 rounded-xl border border-[var(--color-border)] bg-white p-1.5 shadow-[var(--shadow-card-hover)]"
                     >
                       {link.children.map((child) => (
                         <Link
                           key={child.href}
                           href={child.href}
                           onClick={() => setResourcesOpen(false)}
-                          className="block rounded-lg px-3 py-2.5 text-[13px] text-slate-700 transition hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/30"
+                          className="block rounded-lg px-3 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/30"
                         >
                           {child.label}
                         </Link>
@@ -106,7 +106,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                 href={link.href}
                 className={link.label === "Shop"
                   ? "whitespace-nowrap rounded-full bg-[var(--color-primary)]/10 px-3 py-2 font-semibold text-[var(--color-primary)] transition hover:bg-[var(--color-primary)]/15"
-                  : "whitespace-nowrap px-1 py-2 transition hover:text-slate-900"}
+                  : "whitespace-nowrap px-1 py-2 transition hover:text-[var(--color-primary)]"}
               >
                 {link.label}
               </Link>
@@ -130,7 +130,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.25 }}
-              className="overflow-hidden border-t border-[var(--color-border)] bg-white lg:hidden"
+              className="overflow-hidden border-t border-[var(--color-border)] bg-white shadow-[var(--shadow-card)] lg:hidden"
             >
               <div className="space-y-2 px-6 py-4">
                 {navLinks.map((link, index) => (
@@ -206,7 +206,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <main>{children}</main>
 
       <footer className="border-t border-[var(--color-border)] bg-slate-50 text-slate-700">
-        <div className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr] lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 lg:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr] lg:px-8 lg:py-16">
           <div>
             <h2 className="text-xl font-semibold text-slate-900">PowerWave AV</h2>
             <p className="mt-4 max-w-md text-sm leading-7 text-slate-600">
@@ -218,7 +218,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Services</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Services</h3>
             <ul className="mt-4 space-y-3 text-sm text-slate-600">
               {services.slice(0, 4).map((item) => (
                 <li key={item.title}><Link href={item.href} className="transition hover:text-slate-900">{item.title}</Link></li>
@@ -226,7 +226,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Industries</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Industries</h3>
             <ul className="mt-4 space-y-3 text-sm text-slate-600">
               {industries.slice(0, 4).map((item) => (
                 <li key={item.name}><Link href={item.href} className="transition hover:text-slate-900">{item.name}</Link></li>
@@ -234,7 +234,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Resources</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Resources</h3>
             <ul className="mt-4 space-y-3 text-sm text-slate-600">
               <li><Link href="/blog" className="transition hover:text-slate-900">Insights & guides</Link></li>
               <li><Link href="/faq" className="transition hover:text-slate-900">FAQ</Link></li>
