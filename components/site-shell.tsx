@@ -3,23 +3,33 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import { Phone, MessageCircle } from "@/components/icons";
 import { services, industries } from "@/lib/content";
 
-const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Services", href: "/services" },
-  { label: "Shop", href: "/shop" },
-  { label: "Solutions", href: "/industries" },
+const resourceLinks = [
   { label: "Case Studies", href: "/projects/case-studies" },
   { label: "Buyer Guides", href: "/resources/buyer-guides" },
   { label: "Blog", href: "/blog" },
-  { label: "Contact", href: "/contact" },
+];
+
+type NavLink =
+  | { type: "link"; label: string; href: string }
+  | { type: "dropdown"; label: string; children: typeof resourceLinks };
+
+const navLinks: NavLink[] = [
+  { type: "link", label: "Home", href: "/" },
+  { type: "link", label: "About", href: "/about" },
+  { type: "link", label: "Services", href: "/services" },
+  { type: "link", label: "Shop", href: "/shop" },
+  { type: "link", label: "Solutions", href: "/industries" },
+  { type: "dropdown", label: "Resources", children: resourceLinks },
+  { type: "link", label: "Contact", href: "/contact" },
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
@@ -50,7 +60,47 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           </button>
 
           <nav className="hidden min-w-0 flex-1 items-center justify-center gap-x-2 text-[13px] text-slate-600 lg:flex xl:gap-x-3 2xl:gap-x-4">
-            {navLinks.map((link) => (
+            {navLinks.map((link) => link.type === "dropdown" ? (
+              <div key={link.label} className="relative">
+                <button
+                  type="button"
+                  aria-expanded={resourcesOpen}
+                  aria-haspopup="true"
+                  aria-controls="desktop-resources-menu"
+                  onClick={() => setResourcesOpen((open) => !open)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape") setResourcesOpen(false);
+                  }}
+                  className="inline-flex items-center gap-1 whitespace-nowrap px-1 py-2 transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/30"
+                >
+                  Resources
+                  <ChevronDown size={14} className={`transition-transform ${resourcesOpen ? "rotate-180" : ""}`} />
+                </button>
+                <AnimatePresence>
+                  {resourcesOpen ? (
+                    <motion.div
+                      id="desktop-resources-menu"
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute left-0 top-full z-50 mt-2 w-48 rounded-xl border border-[var(--color-border)] bg-white p-1.5 shadow-lg"
+                    >
+                      {link.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          onClick={() => setResourcesOpen(false)}
+                          className="block rounded-lg px-3 py-2.5 text-[13px] text-slate-700 transition hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/30"
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
+              </div>
+            ) : (
               <Link
                 key={link.href}
                 href={link.href}
@@ -85,18 +135,63 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               <div className="space-y-2 px-6 py-4">
                 {navLinks.map((link, index) => (
                   <motion.div
-                    key={link.href}
+                    key={link.label}
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.04 }}
                   >
-                    <Link
-                      href={link.href}
-                      className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      {link.label}
-                    </Link>
+                    {link.type === "dropdown" ? (
+                      <div>
+                        <button
+                          type="button"
+                          aria-expanded={resourcesOpen}
+                          aria-controls="mobile-resources-menu"
+                          onClick={() => setResourcesOpen((open) => !open)}
+                          className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+                        >
+                          Resources
+                          <ChevronDown size={16} className={`transition-transform ${resourcesOpen ? "rotate-180" : ""}`} />
+                        </button>
+                        <AnimatePresence initial={false}>
+                          {resourcesOpen ? (
+                            <motion.div
+                              id="mobile-resources-menu"
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="ml-4 border-l border-[var(--color-border)] py-1 pl-3">
+                                {link.children.map((child) => (
+                                  <Link
+                                    key={child.href}
+                                    href={child.href}
+                                    className="block rounded-xl px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
+                                    onClick={() => {
+                                      setResourcesOpen(false);
+                                      setMenuOpen(false);
+                                    }}
+                                  >
+                                    {child.label}
+                                  </Link>
+                                ))}
+                              </div>
+                            </motion.div>
+                          ) : null}
+                        </AnimatePresence>
+                      </div>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+                        onClick={() => {
+                          setResourcesOpen(false);
+                          setMenuOpen(false);
+                        }}
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </motion.div>
                 ))}
                 <a href="tel:+254715825819" className="mt-2 block rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">
