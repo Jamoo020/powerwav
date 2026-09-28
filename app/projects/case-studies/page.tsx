@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,7 +16,6 @@ interface CaseStudy {
   solution: string;
   results: string[];
   metrics: Array<{ label: string; value: string }>;
-  image: string;
   videoUrl?: string;
   testimonial?: {
     quote: string;
@@ -49,7 +47,6 @@ const caseStudies: CaseStudy[] = [
       { label: "Executive Satisfaction", value: "9.2/10" },
       { label: "ROI Timeline", value: "18 months" },
     ],
-    image: "/images/case-boardroom.jpeg",
     videoUrl: "https://www.youtube.com/embed/xOEDwECR2t0",
     testimonial: {
       quote:
@@ -80,7 +77,6 @@ const caseStudies: CaseStudy[] = [
       { label: "Staff Training Time", value: "-93%" },
       { label: "Operating Cost Savings", value: "+12%" },
     ],
-    image: "/images/case-hotel.jpeg",
     videoUrl: "https://www.youtube.com/embed/W2rH8y6rHO8",
     testimonial: {
       quote:
@@ -111,7 +107,6 @@ const caseStudies: CaseStudy[] = [
       { label: "Independent Control Points", value: "12+" },
       { label: "Monthly Cost (Music Service)", value: "KES 5,000" },
     ],
-    image: "/images/case-restaurant.jpeg",
     testimonial: {
       quote:
         "The new sound system transformed our dining experience. Guests now comment positively on the ambience, and our team loves the flexibility. This is a difference we notice every single shift.",
@@ -142,7 +137,6 @@ const caseStudies: CaseStudy[] = [
       { label: "Service Uptime", value: "99.8%" },
       { label: "Audio Coverage", value: "Complete" },
     ],
-    image: "/images/case-church.jpeg",
     videoUrl: "https://www.youtube.com/embed/jNgDq3UZ_Kc",
     testimonial: {
       quote:
@@ -188,7 +182,7 @@ export default function CaseStudiesPage() {
         </div>
 
         <div className="mt-16 grid gap-8 lg:grid-cols-[1fr_1.1fr]">
-          {/* Left: Image / Video */}
+          {/* Left: Video / media panel */}
           <motion.div
             key={`${selectedStudy}-image`}
             initial={{ opacity: 0 }}
@@ -210,26 +204,20 @@ export default function CaseStudiesPage() {
                 />
               </div>
             ) : (
-              <>
-                <div className="relative h-96 overflow-hidden">
-                  <Image
-                    src={active.image}
-                    alt={active.title}
-                    fill
-                    unoptimized
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 to-transparent" />
+              <div className="flex h-96 items-center justify-center bg-slate-900 p-8 text-center">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">Case Study</p>
+                  <p className="mt-4 text-2xl font-semibold text-white">{active.title}</p>
+                  {active.videoUrl && (
+                    <button
+                      onClick={() => setShowVideo(true)}
+                      className="mt-8 inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/25 transition"
+                    >
+                      <Play size={18} className="fill-white" /> View project video
+                    </button>
+                  )}
                 </div>
-                {active.videoUrl && (
-                  <button
-                    onClick={() => setShowVideo(true)}
-                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition"
-                  >
-                    <Play size={28} className="text-white fill-white" />
-                  </button>
-                )}
-              </>
+              </div>
             )}
             <div className="p-6">
               <span className="inline-flex rounded-full bg-[var(--color-primary)]/20 px-3 py-1 text-xs font-semibold text-white uppercase tracking-wider">
