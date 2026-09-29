@@ -13,7 +13,6 @@ const solutionLinks: MenuItem[] = [
   { label: "Home Entertainment", href: "/shop" },
   { label: "Commercial AV", href: "/services" },
   { label: "CCTV & Security", href: "/services" },
-  { label: "Networking", href: "/services" },
   { label: "Other AV Solutions", href: "/industries" },
   { label: "Projects / Solutions Delivered", href: "/projects" },
 ];
