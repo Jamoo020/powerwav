@@ -144,7 +144,7 @@ export default function BookRepairPage() {
           <div className="rounded-xl border border-[var(--color-border)] bg-slate-50 p-5">
             <label className="flex items-start gap-3 text-sm leading-6 text-slate-700">
               <input name="confirmation" type="checkbox" required className="mt-1 h-4 w-4 shrink-0 accent-[var(--color-primary)]" />
-              <span>I confirm these details are accurate and understand that this form is a demonstration. It does not contact PowerWave or create a saved repair ticket.</span>
+              <span>I confirm the contact, equipment, problem, and service-preference information above is accurate. This is a preview only; submitting it will not send your information to PowerWave or create a repair ticket.</span>
             </label>
           </div>
           <div className="flex flex-wrap items-center gap-4">
