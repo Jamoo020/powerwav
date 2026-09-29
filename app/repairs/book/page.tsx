@@ -8,24 +8,88 @@ import { SectionHeading } from "@/components/section-heading";
 const fieldClassName = "mt-2 w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/15";
 
 export default function BookRepairPage() {
-  const [submitted, setSubmitted] = useState(false);
+  const [ticketNumber, setTicketNumber] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  if (submitted) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+
+    const formData = new FormData(event.currentTarget);
+    const preferredDate = String(formData.get("preferredDate") ?? "");
+    const preferredTime = String(formData.get("preferredTime") ?? "");
+
+    if (Boolean(preferredDate) !== Boolean(preferredTime)) {
+      setError("Enter both a preferred date and time, or leave both blank.");
+      return;
+    }
+
+    let preferredAt: string | null = null;
+    if (preferredDate && preferredTime) {
+      const parsedPreferredAt = new Date(`${preferredDate}T${preferredTime}:00`);
+      if (Number.isNaN(parsedPreferredAt.getTime())) {
+        setError("Enter a valid preferred date and time.");
+        return;
+      }
+      preferredAt = parsedPreferredAt.toISOString();
+    }
+
+    const additionalInformation = [
+      String(formData.get("additionalInformation") ?? "").trim(),
+      String(formData.get("notes") ?? "").trim(),
+    ].filter(Boolean).join("\n\n");
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/repairs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: formData.get("fullName"),
+          phone: formData.get("phone"),
+          email: formData.get("email"),
+          category: formData.get("category"),
+          brand: formData.get("brand"),
+          model: formData.get("model"),
+          serial_number: formData.get("serialNumber") || null,
+          issue_description: formData.get("problem"),
+          additional_information: additionalInformation || null,
+          preferred_service_option: formData.get("serviceOption"),
+          preferred_at: preferredAt,
+        }),
+      });
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok || result?.success !== true || typeof result.ticket?.ticketNumber !== "string") {
+        setError(typeof result?.error === "string" ? result.error : "Repair request could not be submitted. Please try again.");
+        return;
+      }
+
+      setTicketNumber(result.ticket.ticketNumber);
+    } catch {
+      setError("Network error. Your repair request could not be submitted.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  if (ticketNumber) {
     return (
       <div className="bg-slate-50 text-slate-900">
         <section className="mx-auto max-w-3xl px-6 py-16 lg:px-8 lg:py-20">
           <div className="rounded-2xl border border-[var(--color-border)] bg-white p-7 sm:p-10">
             <CheckCircle size={32} className="text-[var(--color-primary)]" />
-            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-primary)]">Demonstration confirmation</p>
-            <h1 className="mt-3 text-3xl font-semibold text-slate-950">Repair request form preview</h1>
-            <p className="mt-4 leading-7 text-slate-600">This interface is a demonstration only. Your information has not been sent to PowerWave, saved, or used to create a repair ticket.</p>
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-primary)]">Request received</p>
+            <h1 className="mt-3 text-3xl font-semibold text-slate-950">Your repair request has been recorded</h1>
+            <p className="mt-4 leading-7 text-slate-600">Keep this ticket number when contacting PowerWave about your equipment. Live repair status tracking is not connected yet.</p>
             <div className="mt-7 rounded-xl border border-dashed border-[var(--color-primary)]/40 bg-[var(--color-primary)]/5 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Example ticket format · not a real ticket</p>
-              <p className="mt-2 font-mono text-2xl font-semibold text-slate-950">PW-2026-0001</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Repair ticket number</p>
+              <p className="mt-2 font-mono text-2xl font-semibold text-slate-950">{ticketNumber}</p>
             </div>
             <div className="mt-7 flex flex-wrap gap-3">
-              <button type="button" onClick={() => setSubmitted(false)} className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white hover:bg-[#105cda]">Submit another demo request</button>
-              <Link href="/repairs/track" className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50">View demo tracking <ArrowRight size={16} /></Link>
+              <button type="button" onClick={() => setTicketNumber(null)} className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white hover:bg-[#105cda]">Submit another repair request</button>
+              <Link href="/repairs/track" className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50">Track a Repair <ArrowRight size={16} /></Link>
             </div>
           </div>
         </section>
@@ -37,7 +101,8 @@ export default function BookRepairPage() {
     <div className="bg-slate-50 text-slate-900">
       <section className="mx-auto max-w-4xl px-6 py-14 lg:px-8 lg:py-18">
         <SectionHeading eyebrow="Book a Repair" title="Tell us about your equipment" description="Share a few details so the PowerWave team can review the equipment and issue. Service availability is confirmed separately." />
-        <form onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }} className="mt-10 space-y-8 rounded-2xl border border-[var(--color-border)] bg-white p-6 sm:p-9">
+        <form onSubmit={handleSubmit} className="mt-10 space-y-8 rounded-2xl border border-[var(--color-border)] bg-white p-6 sm:p-9">
+          {error ? <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p> : null}
           <fieldset className="grid gap-5 sm:grid-cols-2">
             <legend className="mb-4 text-lg font-semibold text-slate-950">Customer details</legend>
             <label className="text-sm font-medium text-slate-700">Full name<input name="fullName" autoComplete="name" required className={fieldClassName} /></label>
@@ -82,9 +147,8 @@ export default function BookRepairPage() {
               <span>I confirm these details are accurate and understand that this form is a demonstration. It does not contact PowerWave or create a saved repair ticket.</span>
             </label>
           </div>
-          <p role="status" className="text-sm leading-6 text-slate-500">Demo only: form details stay in this page and are not sent or stored.</p>
           <div className="flex flex-wrap items-center gap-4">
-            <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white hover:bg-[#105cda]">Submit Repair Request <ArrowRight size={17} /></button>
+            <button type="submit" disabled={isSubmitting} className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white hover:bg-[#105cda] disabled:cursor-wait disabled:opacity-70">{isSubmitting ? "Submitting..." : "Submit Repair Request"} <ArrowRight size={17} /></button>
             <Link href="/repairs" className="text-sm font-semibold text-slate-600 hover:text-slate-950">Back to repair support</Link>
           </div>
         </form>
