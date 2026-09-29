@@ -25,6 +25,7 @@ const navLinks: NavLink[] = [
   { type: "link", label: "Solutions", href: "/industries" },
   { type: "dropdown", label: "Resources", children: resourceLinks },
   { type: "link", label: "Contact", href: "/contact" },
+  { type: "link", label: "Admin", href: "/admin/login" },
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
