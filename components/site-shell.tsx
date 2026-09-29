@@ -7,30 +7,48 @@ import { ChevronDown } from "lucide-react";
 import { Phone, MessageCircle } from "@/components/icons";
 import { services, industries } from "@/lib/content";
 
-const resourceLinks = [
+type MenuItem = { label: string; href: string };
+
+const solutionLinks: MenuItem[] = [
+  { label: "Home Entertainment", href: "/shop" },
+  { label: "Commercial AV", href: "/services" },
+  { label: "CCTV & Security", href: "/services" },
+  { label: "Networking", href: "/services" },
+  { label: "Other AV Solutions", href: "/industries" },
+  { label: "Projects / Solutions Delivered", href: "/projects" },
+];
+
+const resourceLinks: MenuItem[] = [
   { label: "Case Studies", href: "/projects/case-studies" },
   { label: "Buyer Guides", href: "/resources/buyer-guides" },
   { label: "Blog", href: "/blog" },
 ];
 
+const supportLinks: MenuItem[] = [
+  { label: "Book a Repair", href: "/maintenance" },
+  { label: "Track a Repair", href: "/contact" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Contact Support", href: "/contact" },
+];
+
 type NavLink =
   | { type: "link"; label: string; href: string }
-  | { type: "dropdown"; label: string; children: typeof resourceLinks };
+  | { type: "dropdown"; label: string; children: MenuItem[] };
 
 const navLinks: NavLink[] = [
   { type: "link", label: "Home", href: "/" },
   { type: "link", label: "About", href: "/about" },
+  { type: "dropdown", label: "Solutions", children: solutionLinks },
   { type: "link", label: "Services", href: "/services" },
   { type: "link", label: "Shop", href: "/shop" },
-  { type: "link", label: "Solutions", href: "/industries" },
   { type: "dropdown", label: "Resources", children: resourceLinks },
+  { type: "dropdown", label: "Support", children: supportLinks },
   { type: "link", label: "Contact", href: "/contact" },
-  { type: "link", label: "Admin", href: "/admin/login" },
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [resourcesOpen, setResourcesOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
@@ -65,22 +83,22 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               <div key={link.label} className="relative">
                 <button
                   type="button"
-                  aria-expanded={resourcesOpen}
+                  aria-expanded={openDropdown === link.label}
                   aria-haspopup="true"
-                  aria-controls="desktop-resources-menu"
-                  onClick={() => setResourcesOpen((open) => !open)}
+                  aria-controls={`desktop-${link.label.toLowerCase()}-menu`}
+                  onClick={() => setOpenDropdown((open) => open === link.label ? null : link.label)}
                   onKeyDown={(event) => {
-                    if (event.key === "Escape") setResourcesOpen(false);
+                    if (event.key === "Escape") setOpenDropdown(null);
                   }}
                   className="inline-flex items-center gap-1 whitespace-nowrap px-1 py-2 transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/30"
                 >
-                  Resources
-                  <ChevronDown size={14} className={`transition-transform ${resourcesOpen ? "rotate-180" : ""}`} />
+                  {link.label}
+                  <ChevronDown size={14} className={`transition-transform ${openDropdown === link.label ? "rotate-180" : ""}`} />
                 </button>
                 <AnimatePresence>
-                  {resourcesOpen ? (
+                  {openDropdown === link.label ? (
                     <motion.div
-                      id="desktop-resources-menu"
+                      id={`desktop-${link.label.toLowerCase()}-menu`}
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
@@ -89,9 +107,9 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                     >
                       {link.children.map((child) => (
                         <Link
-                          key={child.href}
+                          key={child.label}
                           href={child.href}
-                          onClick={() => setResourcesOpen(false)}
+                          onClick={() => setOpenDropdown(null)}
                           className="block rounded-lg px-3 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/30"
                         >
                           {child.label}
@@ -145,18 +163,18 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                       <div>
                         <button
                           type="button"
-                          aria-expanded={resourcesOpen}
-                          aria-controls="mobile-resources-menu"
-                          onClick={() => setResourcesOpen((open) => !open)}
+                          aria-expanded={openDropdown === link.label}
+                          aria-controls={`mobile-${link.label.toLowerCase()}-menu`}
+                          onClick={() => setOpenDropdown((open) => open === link.label ? null : link.label)}
                           className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
                         >
-                          Resources
-                          <ChevronDown size={16} className={`transition-transform ${resourcesOpen ? "rotate-180" : ""}`} />
+                          {link.label}
+                          <ChevronDown size={16} className={`transition-transform ${openDropdown === link.label ? "rotate-180" : ""}`} />
                         </button>
                         <AnimatePresence initial={false}>
-                          {resourcesOpen ? (
+                          {openDropdown === link.label ? (
                             <motion.div
-                              id="mobile-resources-menu"
+                              id={`mobile-${link.label.toLowerCase()}-menu`}
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: "auto" }}
                               exit={{ opacity: 0, height: 0 }}
@@ -165,11 +183,11 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                               <div className="ml-4 border-l border-[var(--color-border)] py-1 pl-3">
                                 {link.children.map((child) => (
                                   <Link
-                                    key={child.href}
+                                    key={child.label}
                                     href={child.href}
                                     className="block rounded-xl px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
                                     onClick={() => {
-                                      setResourcesOpen(false);
+                                      setOpenDropdown(null);
                                       setMenuOpen(false);
                                     }}
                                   >
@@ -186,7 +204,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                         href={link.href}
                         className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
                         onClick={() => {
-                          setResourcesOpen(false);
+                          setOpenDropdown(null);
                           setMenuOpen(false);
                         }}
                       >
