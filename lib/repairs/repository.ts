@@ -33,6 +33,20 @@ export class RepairPersistenceError extends Error {
   }
 }
 
+export function normalizeRepairPhone(value: unknown): string {
+  if (typeof value !== "string") {
+    throw new RepairInputError("phone is required.");
+  }
+
+  const phone = value.trim();
+  const digits = phone.replace(/\D/g, "");
+  if (!/^\+?[\d\s().-]+$/.test(phone) || digits.length < 7 || digits.length > 15) {
+    throw new RepairInputError("phone must be a valid phone number.");
+  }
+
+  return digits;
+}
+
 function requiredText(value: unknown, field: string, maxLength: number): string {
   if (typeof value !== "string" || value.trim() === "") {
     throw new RepairInputError(`${field} is required.`);
@@ -95,10 +109,7 @@ export function validateCreateRepairTicketInput(payload: unknown): CreateRepairT
 
   const fullName = requiredText(data.full_name, "full_name", 150);
   const phone = requiredText(data.phone, "phone", 40);
-  const phoneDigits = phone.replace(/\D/g, "");
-  if (!/^\+?[\d\s().-]+$/.test(phone) || phoneDigits.length < 7 || phoneDigits.length > 15) {
-    throw new RepairInputError("phone must be a valid phone number.");
-  }
+  normalizeRepairPhone(phone);
 
   const email = requiredText(data.email, "email", 254).toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
