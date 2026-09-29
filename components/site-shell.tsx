@@ -25,8 +25,8 @@ const resourceLinks: MenuItem[] = [
 ];
 
 const supportLinks: MenuItem[] = [
-  { label: "Book a Repair", href: "/maintenance" },
-  { label: "Track a Repair", href: "/contact" },
+  { label: "Book a Repair", href: "/repairs/book" },
+  { label: "Track a Repair", href: "/repairs/track" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact Support", href: "/contact" },
 ];
