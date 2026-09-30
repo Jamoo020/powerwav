@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { Eye, Search } from "lucide-react";
+import DiagnosisQuoteForm from "./diagnosis-quote-form";
 import {
   getAllowedRepairStatusTransitions,
   repairStatusLabels,
@@ -130,6 +131,7 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
   const [transitionError, setTransitionError] = useState("");
   const [transitionLoading, setTransitionLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [diagnosisTicket, setDiagnosisTicket] = useState<AdminRepairTicket | null>(null);
 
   useEffect(() => {
     let isActive = true;
@@ -215,6 +217,13 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
     } finally {
       setTransitionLoading(false);
     }
+  }
+
+  function handleQuoteIssued(message: string) {
+    setSuccessMessage(message);
+    setExpandedTicketId(diagnosisTicket?.id ?? null);
+    setDiagnosisTicket(null);
+    setReloadKey((value) => value + 1);
   }
 
   return (
@@ -346,7 +355,11 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
                                 <td className="px-4 py-4">
                                   <div className="flex flex-col items-start gap-2">
                                     <StatusBadge status={ticket.status} />
-                                    {getAllowedRepairStatusTransitions(ticket.status).length > 0 ? (
+                                    {ticket.status === "DIAGNOSIS_AND_QUOTE" ? (
+                                      <button type="button" onClick={() => setDiagnosisTicket(ticket)} className="text-xs font-semibold text-sky-700 hover:underline">
+                                        Diagnosis &amp; Quote
+                                      </button>
+                                    ) : getAllowedRepairStatusTransitions(ticket.status).length > 0 ? (
                                       <button type="button" onClick={() => openTransition(ticket)} className="text-xs font-semibold text-sky-700 hover:underline">
                                         Change status
                                       </button>
@@ -394,7 +407,11 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
                             <button type="button" aria-expanded={isExpanded} onClick={() => setExpandedTicketId(isExpanded ? null : ticket.id)} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800">
                               <Eye aria-hidden="true" className="h-4 w-4" /> {isExpanded ? "Close details" : "View details"}
                             </button>
-                            {getAllowedRepairStatusTransitions(ticket.status).length > 0 ? (
+                            {ticket.status === "DIAGNOSIS_AND_QUOTE" ? (
+                              <button type="button" onClick={() => setDiagnosisTicket(ticket)} className="rounded-lg bg-sky-700 px-3 py-2 text-xs font-semibold text-white hover:bg-sky-800">
+                                Diagnosis &amp; Quote
+                              </button>
+                            ) : getAllowedRepairStatusTransitions(ticket.status).length > 0 ? (
                               <button type="button" onClick={() => openTransition(ticket)} className="rounded-lg bg-sky-700 px-3 py-2 text-xs font-semibold text-white hover:bg-sky-800">
                                 Change status
                               </button>
@@ -480,6 +497,15 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
             </form>
           </section>
         </div>
+      ) : null}
+      {diagnosisTicket?.status === "DIAGNOSIS_AND_QUOTE" ? (
+        <DiagnosisQuoteForm
+          ticketId={diagnosisTicket.id}
+          ticketNumber={diagnosisTicket.ticketNumber}
+          diagnosis={diagnosisTicket.diagnosis}
+          onClose={() => setDiagnosisTicket(null)}
+          onIssued={handleQuoteIssued}
+        />
       ) : null}
     </main>
   );

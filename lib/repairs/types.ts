@@ -38,6 +38,10 @@ export type AdminRepairTicket = {
   createdAt: string;
   updatedAt: string;
   timeline: AdminRepairTimelineEntry[];
+  diagnosis: {
+    findings: string;
+    recommendedAction: string | null;
+  } | null;
 };
 
 export type AdminRepairTimelineEntry = {
@@ -63,6 +67,12 @@ export const repairStatusOrder = [
 ] as const;
 
 export type RepairStatus = (typeof repairStatusOrder)[number];
+
+export const repairQuoteCurrencies = ["KES", "GBP", "USD", "EUR"] as const;
+export type RepairQuoteCurrency = (typeof repairQuoteCurrencies)[number];
+
+export const repairQuoteItemTypes = ["PART", "LABOUR", "OTHER"] as const;
+export type RepairQuoteItemType = (typeof repairQuoteItemTypes)[number];
 
 const repairStatusTransitions: Record<RepairStatus, readonly RepairStatus[]> = {
   REQUEST_RECEIVED: ["APPOINTMENT_SCHEDULED", "CANCELLED"],
