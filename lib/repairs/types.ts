@@ -16,6 +16,29 @@ export type CreatedRepairTicket = {
   ticketNumber: string;
 };
 
+export type AdminRepairTicket = {
+  id: string;
+  ticketNumber: string;
+  status: RepairStatus;
+  statusLabel: string;
+  customer: {
+    name: string;
+    phone: string;
+    email: string;
+  };
+  equipment: {
+    category: string;
+    brand: string;
+    model: string;
+    serialNumber: string | null;
+  };
+  issueDescription: string;
+  preferredServiceOption: string | null;
+  preferredAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export const repairStatusOrder = [
   "REQUEST_RECEIVED",
   "APPOINTMENT_SCHEDULED",

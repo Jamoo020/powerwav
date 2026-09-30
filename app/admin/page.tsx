@@ -123,6 +123,17 @@ export default function AdminPage() {
 
             <div className="grid gap-4 md:grid-cols-2">
               <Link
+                href="/admin/repairs"
+                className="group rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-sky-200 hover:bg-sky-50"
+              >
+                <div className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-sky-100 text-lg font-semibold text-sky-700">
+                  R
+                </div>
+                <h2 className="text-xl font-semibold text-slate-900">Repair management</h2>
+                <p className="mt-2 text-sm text-slate-600">View customer repair requests and ticket details.</p>
+              </Link>
+
+              <Link
                 href="/admin/products"
                 className="group rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-sky-200 hover:bg-sky-50"
               >

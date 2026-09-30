@@ -3,7 +3,13 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import type { PoolClient } from "pg";
 import { pool } from "@/lib/db";
-import type { CreateRepairTicketInput, CreatedRepairTicket } from "./types";
+import {
+  repairStatusLabels,
+  type AdminRepairTicket,
+  type CreateRepairTicketInput,
+  type CreatedRepairTicket,
+  type RepairStatus,
+} from "./types";
 
 const allowedInputFields = new Set([
   "full_name",
@@ -248,4 +254,112 @@ export async function createRepairTicket(payload: unknown): Promise<CreatedRepai
   } finally {
     client?.release();
   }
+}
+
+type AdminRepairTicketRow = {
+  id: string;
+  ticket_number: string;
+  status: RepairStatus;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string;
+  equipment_category: string;
+  equipment_brand: string;
+  equipment_model: string;
+  serial_number: string | null;
+  issue_description: string;
+  preferred_service_option: string | null;
+  preferred_at: Date | null;
+  created_at: Date;
+  updated_at: Date;
+};
+
+export type AdminRepairStatusCounts = Partial<Record<RepairStatus, number>>;
+
+export async function listAdminRepairTickets(filters: {
+  status?: RepairStatus;
+  search?: string;
+}): Promise<{ tickets: AdminRepairTicket[]; statusCounts: AdminRepairStatusCounts }> {
+  const conditions: string[] = [];
+  const values: string[] = [];
+
+  if (filters.status) {
+    values.push(filters.status);
+    conditions.push(`t.status = $${values.length}`);
+  }
+
+  if (filters.search) {
+    values.push(`%${filters.search}%`);
+    const searchParameter = `$${values.length}`;
+    conditions.push(`(
+      t.ticket_number ILIKE ${searchParameter}
+      OR c.full_name ILIKE ${searchParameter}
+      OR c.phone ILIKE ${searchParameter}
+      OR e.brand ILIKE ${searchParameter}
+      OR e.model ILIKE ${searchParameter}
+    )`);
+  }
+
+  const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const [ticketsResult, countsResult] = await Promise.all([
+    pool.query<AdminRepairTicketRow>(
+      `SELECT t.id,
+              t.ticket_number,
+              t.status,
+              c.full_name AS customer_name,
+              c.phone AS customer_phone,
+              c.email AS customer_email,
+              e.category AS equipment_category,
+              e.brand AS equipment_brand,
+              e.model AS equipment_model,
+              e.serial_number,
+              t.issue_description,
+              t.preferred_service_option,
+              t.preferred_at,
+              t.created_at,
+              t.updated_at
+       FROM repair_tickets t
+       JOIN repair_customers c ON c.id = t.customer_id
+       JOIN repair_equipment e ON e.id = t.equipment_id
+       ${whereClause}
+       ORDER BY t.updated_at DESC, t.created_at DESC`,
+      values,
+    ),
+    pool.query<{ status: RepairStatus; count: string }>(
+      `SELECT status, COUNT(*) AS count
+       FROM repair_tickets
+       GROUP BY status`,
+    ),
+  ]);
+
+  const statusCounts: AdminRepairStatusCounts = {};
+  for (const row of countsResult.rows) {
+    statusCounts[row.status] = Number(row.count);
+  }
+
+  return {
+    tickets: ticketsResult.rows.map((row) => ({
+      id: row.id,
+      ticketNumber: row.ticket_number,
+      status: row.status,
+      statusLabel: repairStatusLabels[row.status],
+      customer: {
+        name: row.customer_name,
+        phone: row.customer_phone,
+        email: row.customer_email,
+      },
+      equipment: {
+        category: row.equipment_category,
+        brand: row.equipment_brand,
+        model: row.equipment_model,
+        serialNumber: row.serial_number,
+      },
+      issueDescription: row.issue_description,
+      preferredServiceOption: row.preferred_service_option,
+      preferredAt: row.preferred_at?.toISOString() ?? null,
+      createdAt: row.created_at.toISOString(),
+      updatedAt: row.updated_at.toISOString(),
+    })),
+    statusCounts,
+  };
 }
