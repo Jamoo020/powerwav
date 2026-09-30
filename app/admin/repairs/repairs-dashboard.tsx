@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { Eye, Search } from "lucide-react";
-import { repairStatusLabels, repairStatusOrder, type AdminRepairTicket, type RepairStatus } from "@/lib/repairs/types";
+import {
+  getAllowedRepairStatusTransitions,
+  repairStatusLabels,
+  repairStatusOrder,
+  type AdminRepairTicket,
+  type RepairStatus,
+} from "@/lib/repairs/types";
 
 type RepairsResponse = {
   tickets: AdminRepairTicket[];
@@ -66,24 +72,46 @@ function StatusBadge({ status }: { status: RepairStatus }) {
 
 function TicketDetails({ ticket }: { ticket: AdminRepairTicket }) {
   return (
-    <div className="grid gap-5 border-t border-slate-200 bg-slate-50 p-5 sm:grid-cols-2 lg:grid-cols-3">
-      <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Issue description</h3>
-        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-800">{ticket.issueDescription}</p>
+    <div className="space-y-5 border-t border-slate-200 bg-slate-50 p-5">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Issue description</h3>
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-800">{ticket.issueDescription}</p>
+        </div>
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Customer contact</h3>
+          <p className="mt-2 text-sm font-medium text-slate-900">{ticket.customer.name}</p>
+          <a className="mt-1 block text-sm text-sky-700 hover:underline" href={`tel:${ticket.customer.phone}`}>{ticket.customer.phone}</a>
+          <a className="mt-1 block break-all text-sm text-sky-700 hover:underline" href={`mailto:${ticket.customer.email}`}>{ticket.customer.email}</a>
+        </div>
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Equipment and dates</h3>
+          <p className="mt-2 text-sm text-slate-800">{ticket.equipment.category} · {ticket.equipment.brand} {ticket.equipment.model}</p>
+          <p className="mt-1 text-sm text-slate-600">Serial: {ticket.equipment.serialNumber || "Not provided"}</p>
+          <p className="mt-3 text-sm text-slate-600">Created {formatDate(ticket.createdAt, true)}</p>
+          <p className="mt-1 text-sm text-slate-600">Updated {formatDate(ticket.updatedAt, true)}</p>
+        </div>
       </div>
-      <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Customer contact</h3>
-        <p className="mt-2 text-sm font-medium text-slate-900">{ticket.customer.name}</p>
-        <a className="mt-1 block text-sm text-sky-700 hover:underline" href={`tel:${ticket.customer.phone}`}>{ticket.customer.phone}</a>
-        <a className="mt-1 block break-all text-sm text-sky-700 hover:underline" href={`mailto:${ticket.customer.email}`}>{ticket.customer.email}</a>
-      </div>
-      <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Equipment and dates</h3>
-        <p className="mt-2 text-sm text-slate-800">{ticket.equipment.category} · {ticket.equipment.brand} {ticket.equipment.model}</p>
-        <p className="mt-1 text-sm text-slate-600">Serial: {ticket.equipment.serialNumber || "Not provided"}</p>
-        <p className="mt-3 text-sm text-slate-600">Created {formatDate(ticket.createdAt, true)}</p>
-        <p className="mt-1 text-sm text-slate-600">Updated {formatDate(ticket.updatedAt, true)}</p>
-      </div>
+
+      <section className="border-t border-slate-200 pt-5" aria-label="Customer-visible status timeline">
+        <h3 className="text-sm font-semibold text-slate-900">Status timeline</h3>
+        {ticket.timeline.length === 0 ? (
+          <p className="mt-3 text-sm text-slate-500">No customer updates have been recorded.</p>
+        ) : (
+          <ol className="mt-4 space-y-4">
+            {ticket.timeline.map((entry, index) => (
+              <li key={`${entry.createdAt}-${index}`} className="relative border-l border-slate-300 pl-4">
+                <p className="text-xs text-slate-500">{formatDate(entry.createdAt, true)}</p>
+                <p className="mt-1 text-sm font-medium text-slate-900">
+                  {entry.fromStatus ? repairStatusLabels[entry.fromStatus] : "Request received"}
+                  {entry.statusLabel ? ` → ${entry.statusLabel}` : ""}
+                </p>
+                <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{entry.customerUpdate}</p>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
     </div>
   );
 }
@@ -96,6 +124,12 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
   const [error, setError] = useState("");
   const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  const [transitionTicket, setTransitionTicket] = useState<AdminRepairTicket | null>(null);
+  const [transitionStatus, setTransitionStatus] = useState<RepairStatus | "">("");
+  const [customerUpdate, setCustomerUpdate] = useState("");
+  const [transitionError, setTransitionError] = useState("");
+  const [transitionLoading, setTransitionLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     let isActive = true;
@@ -138,6 +172,51 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
 
   const visibleTickets = data.tickets;
 
+  function openTransition(ticket: AdminRepairTicket) {
+    const nextStatuses = getAllowedRepairStatusTransitions(ticket.status);
+    if (nextStatuses.length === 0) return;
+    setTransitionTicket(ticket);
+    setTransitionStatus(nextStatuses[0]);
+    setCustomerUpdate("");
+    setTransitionError("");
+    setSuccessMessage("");
+  }
+
+  function closeTransition() {
+    if (transitionLoading) return;
+    setTransitionTicket(null);
+    setTransitionStatus("");
+    setTransitionError("");
+  }
+
+  async function submitTransition(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!transitionTicket || !transitionStatus || transitionLoading) return;
+
+    setTransitionLoading(true);
+    setTransitionError("");
+    try {
+      const response = await fetch(`/api/admin/repairs/${encodeURIComponent(transitionTicket.id)}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: transitionStatus, customerUpdate }),
+      });
+      const result = (await response.json().catch(() => null)) as { message?: string; statusLabel?: string } | null;
+      if (!response.ok) {
+        throw new Error(result?.message ?? "Unable to change repair status.");
+      }
+
+      setSuccessMessage(`${transitionTicket.ticketNumber} status changed to ${result?.statusLabel ?? repairStatusLabels[transitionStatus]}.`);
+      setTransitionTicket(null);
+      setTransitionStatus("");
+      setReloadKey((value) => value + 1);
+    } catch (requestError) {
+      setTransitionError(requestError instanceof Error ? requestError.message : "Unable to change repair status.");
+    } finally {
+      setTransitionLoading(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -163,6 +242,12 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
           </header>
 
           <section className="space-y-6 px-5 py-6 sm:px-8 sm:py-8">
+            {successMessage ? (
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">
+                {successMessage}
+              </div>
+            ) : null}
+
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-3 2xl:grid-cols-6">
               {summaryCards.map((card) => (
                 <div key={card.label} className={`rounded-xl border p-4 ${summaryColors[card.color]}`}>
@@ -258,7 +343,16 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
                                   <p className="font-medium text-slate-900">{ticket.equipment.brand} {ticket.equipment.model}</p>
                                   <p className="mt-1 text-xs text-slate-500">{ticket.equipment.category}</p>
                                 </td>
-                                <td className="px-4 py-4"><StatusBadge status={ticket.status} /></td>
+                                <td className="px-4 py-4">
+                                  <div className="flex flex-col items-start gap-2">
+                                    <StatusBadge status={ticket.status} />
+                                    {getAllowedRepairStatusTransitions(ticket.status).length > 0 ? (
+                                      <button type="button" onClick={() => openTransition(ticket)} className="text-xs font-semibold text-sky-700 hover:underline">
+                                        Change status
+                                      </button>
+                                    ) : <span className="text-xs text-slate-500">Final status</span>}
+                                  </div>
+                                </td>
                                 <td className="px-4 py-4 text-slate-700">{ticket.preferredServiceOption || "Not specified"}</td>
                                 <td className="whitespace-nowrap px-4 py-4 text-slate-700">{formatDate(ticket.preferredAt)}</td>
                                 <td className="whitespace-nowrap px-4 py-4 text-slate-700">{formatDate(ticket.updatedAt)}</td>
@@ -296,9 +390,16 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
                             <div><p className="text-xs font-medium text-slate-500">Preferred date</p><p className="mt-1 text-slate-800">{formatDate(ticket.preferredAt)}</p></div>
                             <div><p className="text-xs font-medium text-slate-500">Updated</p><p className="mt-1 text-slate-800">{formatDate(ticket.updatedAt)}</p></div>
                           </div>
-                          <button type="button" aria-expanded={isExpanded} onClick={() => setExpandedTicketId(isExpanded ? null : ticket.id)} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800">
-                            <Eye aria-hidden="true" className="h-4 w-4" /> {isExpanded ? "Close details" : "View details"}
-                          </button>
+                          <div className="flex flex-wrap gap-2">
+                            <button type="button" aria-expanded={isExpanded} onClick={() => setExpandedTicketId(isExpanded ? null : ticket.id)} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800">
+                              <Eye aria-hidden="true" className="h-4 w-4" /> {isExpanded ? "Close details" : "View details"}
+                            </button>
+                            {getAllowedRepairStatusTransitions(ticket.status).length > 0 ? (
+                              <button type="button" onClick={() => openTransition(ticket)} className="rounded-lg bg-sky-700 px-3 py-2 text-xs font-semibold text-white hover:bg-sky-800">
+                                Change status
+                              </button>
+                            ) : <span className="self-center text-xs text-slate-500">Final status</span>}
+                          </div>
                         </div>
                         {isExpanded ? <TicketDetails ticket={ticket} /> : null}
                       </article>
@@ -310,6 +411,76 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
           </section>
         </div>
       </div>
+      {transitionTicket && transitionStatus ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/60 p-4" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) closeTransition();
+        }}>
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="repair-status-dialog-title"
+            aria-describedby="repair-status-dialog-description"
+            onKeyDown={(event) => {
+              if (event.key === "Escape") closeTransition();
+            }}
+            className="my-auto w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-7"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 id="repair-status-dialog-title" className="text-xl font-semibold text-slate-900">Confirm status change</h2>
+                <p id="repair-status-dialog-description" className="mt-2 text-sm leading-6 text-slate-600">
+                  Change {transitionTicket.ticketNumber} from <span className="font-semibold text-slate-900">{repairStatusLabels[transitionTicket.status]}</span> to <span className="font-semibold text-slate-900">{repairStatusLabels[transitionStatus]}</span>?
+                </p>
+              </div>
+              <button type="button" onClick={closeTransition} disabled={transitionLoading} aria-label="Close dialog" className="rounded-lg px-2 py-1 text-xl leading-none text-slate-500 hover:bg-slate-100 disabled:opacity-50">
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={submitTransition} className="mt-6 space-y-5">
+              <label className="block space-y-2">
+                <span className="text-sm font-medium text-slate-800">Next status</span>
+                <select
+                  value={transitionStatus}
+                  onChange={(event) => setTransitionStatus(event.target.value as RepairStatus)}
+                  disabled={transitionLoading}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+                >
+                  {getAllowedRepairStatusTransitions(transitionTicket.status).map((nextStatus) => (
+                    <option key={nextStatus} value={nextStatus}>{repairStatusLabels[nextStatus]}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="block space-y-2">
+                <span className="text-sm font-medium text-slate-800">Customer-facing update</span>
+                <textarea
+                  autoFocus
+                  required
+                  maxLength={2000}
+                  rows={4}
+                  value={customerUpdate}
+                  onChange={(event) => setCustomerUpdate(event.target.value)}
+                  disabled={transitionLoading}
+                  placeholder="Write a plain-text update the customer can see."
+                  className="w-full resize-y rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+                />
+                <span className="block text-right text-xs text-slate-500">{customerUpdate.length}/2000</span>
+              </label>
+              {transitionError ? (
+                <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-sm text-rose-800" role="alert">{transitionError}</p>
+              ) : null}
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button type="button" onClick={closeTransition} disabled={transitionLoading} className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50">
+                  Cancel
+                </button>
+                <button type="submit" disabled={transitionLoading || !customerUpdate.trim()} className="inline-flex items-center justify-center gap-2 rounded-xl bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-60">
+                  {transitionLoading ? <><span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> Updating...</> : "Confirm status change"}
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      ) : null}
     </main>
   );
 }

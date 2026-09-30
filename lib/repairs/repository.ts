@@ -4,8 +4,10 @@ import { randomBytes } from "node:crypto";
 import type { PoolClient } from "pg";
 import { pool } from "@/lib/db";
 import {
+  getAllowedRepairStatusTransitions,
   repairStatusLabels,
   type AdminRepairTicket,
+  type AdminRepairTimelineEntry,
   type CreateRepairTicketInput,
   type CreatedRepairTicket,
   type RepairStatus,
@@ -36,6 +38,23 @@ export class RepairPersistenceError extends Error {
   constructor() {
     super("Repair request could not be saved.");
     this.name = "RepairPersistenceError";
+  }
+}
+
+export class RepairStatusTransitionError extends Error {
+  constructor(
+    message: string,
+    readonly statusCode: 404 | 409,
+  ) {
+    super(message);
+    this.name = "RepairStatusTransitionError";
+  }
+}
+
+export class RepairStatusTransitionPersistenceError extends Error {
+  constructor() {
+    super("Repair status could not be updated.");
+    this.name = "RepairStatusTransitionPersistenceError";
   }
 }
 
@@ -274,6 +293,14 @@ type AdminRepairTicketRow = {
   updated_at: Date;
 };
 
+type AdminRepairTimelineRow = {
+  ticket_id: string;
+  from_status: RepairStatus | null;
+  to_status: RepairStatus | null;
+  customer_update: string;
+  created_at: Date;
+};
+
 export type AdminRepairStatusCounts = Partial<Record<RepairStatus, number>>;
 
 export async function listAdminRepairTickets(filters: {
@@ -337,6 +364,31 @@ export async function listAdminRepairTickets(filters: {
     statusCounts[row.status] = Number(row.count);
   }
 
+  const ticketIds = ticketsResult.rows.map((row) => row.id);
+  const timelineResult = ticketIds.length
+    ? await pool.query<AdminRepairTimelineRow>(
+        `SELECT ticket_id, from_status, to_status, customer_update, created_at
+         FROM repair_timeline_events
+         WHERE ticket_id = ANY($1::uuid[])
+           AND customer_update IS NOT NULL
+           AND btrim(customer_update) <> ''
+         ORDER BY created_at ASC, id ASC`,
+        [ticketIds],
+      )
+    : { rows: [] as AdminRepairTimelineRow[] };
+  const timelines = new Map<string, AdminRepairTimelineEntry[]>();
+  for (const row of timelineResult.rows) {
+    const entries = timelines.get(row.ticket_id) ?? [];
+    entries.push({
+      fromStatus: row.from_status,
+      status: row.to_status,
+      statusLabel: row.to_status ? repairStatusLabels[row.to_status] : null,
+      customerUpdate: row.customer_update,
+      createdAt: row.created_at.toISOString(),
+    });
+    timelines.set(row.ticket_id, entries);
+  }
+
   return {
     tickets: ticketsResult.rows.map((row) => ({
       id: row.id,
@@ -359,7 +411,91 @@ export async function listAdminRepairTickets(filters: {
       preferredAt: row.preferred_at?.toISOString() ?? null,
       createdAt: row.created_at.toISOString(),
       updatedAt: row.updated_at.toISOString(),
+      timeline: timelines.get(row.id) ?? [],
     })),
     statusCounts,
   };
+}
+
+export async function transitionRepairStatus(input: {
+  ticketId: string;
+  status: RepairStatus;
+  customerUpdate: string;
+  actorAdminUserId: string;
+}): Promise<{ status: RepairStatus; statusLabel: string; updatedAt: string }> {
+  let client: PoolClient | undefined;
+  let transactionOpen = false;
+
+  try {
+    client = await pool.connect();
+    await client.query("BEGIN");
+    transactionOpen = true;
+
+    const ticketResult = await client.query<{ status: RepairStatus }>(
+      "SELECT status FROM repair_tickets WHERE id = $1 FOR UPDATE",
+      [input.ticketId],
+    );
+    const ticket = ticketResult.rows[0];
+    if (!ticket) {
+      throw new RepairStatusTransitionError("Repair ticket not found.", 404);
+    }
+
+    if (!getAllowedRepairStatusTransitions(ticket.status).includes(input.status)) {
+      throw new RepairStatusTransitionError(
+        `Cannot change status from ${repairStatusLabels[ticket.status]} to ${repairStatusLabels[input.status]}.`,
+        409,
+      );
+    }
+
+    const updateResult = await client.query<{ status: RepairStatus; updated_at: Date }>(
+      `UPDATE repair_tickets
+       SET status = $2,
+           updated_at = NOW(),
+           status_updated_at = NOW()
+       WHERE id = $1
+       RETURNING status, updated_at`,
+      [input.ticketId, input.status],
+    );
+    const updatedTicket = updateResult.rows[0];
+
+    await client.query(
+      `INSERT INTO repair_timeline_events (
+         ticket_id,
+         event_type,
+         from_status,
+         to_status,
+         customer_update,
+         internal_note,
+         actor_type,
+         actor_admin_user_id,
+         created_at
+       )
+       VALUES ($1, 'STATUS_CHANGED', $2, $3, $4, NULL, 'ADMIN', $5, NOW())`,
+      [input.ticketId, ticket.status, input.status, input.customerUpdate, input.actorAdminUserId],
+    );
+
+    await client.query("COMMIT");
+    transactionOpen = false;
+
+    return {
+      status: updatedTicket.status,
+      statusLabel: repairStatusLabels[updatedTicket.status],
+      updatedAt: updatedTicket.updated_at.toISOString(),
+    };
+  } catch (error) {
+    if (transactionOpen && client) {
+      try {
+        await client.query("ROLLBACK");
+      } catch {
+        // Preserve the original transition error.
+      }
+    }
+
+    if (error instanceof RepairStatusTransitionError) {
+      throw error;
+    }
+    throw new RepairStatusTransitionPersistenceError();
+  } finally {
+    client?.release();
+  }
 }

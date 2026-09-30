@@ -37,6 +37,15 @@ export type AdminRepairTicket = {
   preferredAt: string | null;
   createdAt: string;
   updatedAt: string;
+  timeline: AdminRepairTimelineEntry[];
+};
+
+export type AdminRepairTimelineEntry = {
+  fromStatus: RepairStatus | null;
+  status: RepairStatus | null;
+  statusLabel: string | null;
+  customerUpdate: string;
+  createdAt: string;
 };
 
 export const repairStatusOrder = [
@@ -54,6 +63,28 @@ export const repairStatusOrder = [
 ] as const;
 
 export type RepairStatus = (typeof repairStatusOrder)[number];
+
+const repairStatusTransitions: Record<RepairStatus, readonly RepairStatus[]> = {
+  REQUEST_RECEIVED: ["APPOINTMENT_SCHEDULED", "CANCELLED"],
+  APPOINTMENT_SCHEDULED: ["DEVICE_RECEIVED", "CANCELLED"],
+  DEVICE_RECEIVED: ["DIAGNOSIS_AND_QUOTE", "CANCELLED"],
+  DIAGNOSIS_AND_QUOTE: ["AWAITING_CUSTOMER_APPROVAL", "CANCELLED"],
+  AWAITING_CUSTOMER_APPROVAL: ["AWAITING_PARTS", "CANCELLED"],
+  AWAITING_PARTS: ["REPAIR_IN_PROGRESS", "CANCELLED"],
+  REPAIR_IN_PROGRESS: ["TESTING_QC", "CANCELLED"],
+  TESTING_QC: ["READY_FOR_COLLECTION", "CANCELLED"],
+  READY_FOR_COLLECTION: ["COMPLETED", "CANCELLED"],
+  COMPLETED: [],
+  CANCELLED: [],
+};
+
+export function getAllowedRepairStatusTransitions(status: RepairStatus): readonly RepairStatus[] {
+  return repairStatusTransitions[status];
+}
+
+export function isRepairStatus(value: unknown): value is RepairStatus {
+  return typeof value === "string" && repairStatusOrder.some((status) => status === value);
+}
 
 export const repairStatusLabels: Record<RepairStatus, string> = {
   REQUEST_RECEIVED: "Request Received",
