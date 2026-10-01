@@ -1,39 +1,8 @@
-"use client";
-
-import React, { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, MessageCircle, Phone, Mail, MapPin } from "@/components/icons";
 import { SectionHeading } from "@/components/section-heading";
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", company: "", phone: "", email: "", service: "", message: "" });
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<null | { ok: boolean; message: string }>(null);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
-      setStatus({ ok: false, message: "Please complete your name, email, and message." });
-      return;
-    }
-
-    setLoading(true);
-    setStatus(null);
-
-    try {
-      const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-      const data = await res.json();
-      setStatus({ ok: data.ok, message: data.message });
-      if (data.ok) setForm({ name: "", company: "", phone: "", email: "", service: "", message: "" });
-    } catch (err) {
-      console.error(err);
-      setStatus({ ok: false, message: "Network error" });
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
     <div className="bg-slate-50 text-slate-900">
       <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
@@ -63,23 +32,17 @@ export default function ContactPage() {
                 referrerPolicy="no-referrer-when-downgrade"
               />
             </div>
-            <form onSubmit={handleSubmit} className="rounded-[2rem] border border-[var(--color-border)] bg-white p-10 shadow-sm">
+            <form className="rounded-[2rem] border border-[var(--color-border)] bg-white p-10 shadow-sm">
               <div className="grid gap-5 md:grid-cols-2">
-                <label className="block text-sm text-slate-700"><span className="mb-2 block font-semibold">Name</span><input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Your name" /></label>
-                <label className="block text-sm text-slate-700"><span className="mb-2 block font-semibold">Company</span><input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Company name" /></label>
-                <label className="block text-sm text-slate-700"><span className="mb-2 block font-semibold">Phone</span><input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Phone number" /></label>
-                <label className="block text-sm text-slate-700"><span className="mb-2 block font-semibold">Email</span><input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="you@company.com" /></label>
+                <label className="block text-sm text-slate-700"><span className="mb-2 block font-semibold">Name</span><input className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Your name" /></label>
+                <label className="block text-sm text-slate-700"><span className="mb-2 block font-semibold">Company</span><input className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Company name" /></label>
+                <label className="block text-sm text-slate-700"><span className="mb-2 block font-semibold">Phone</span><input className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Phone number" /></label>
+                <label className="block text-sm text-slate-700"><span className="mb-2 block font-semibold">Email</span><input className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="you@company.com" /></label>
               </div>
-              <label className="mt-5 block text-sm text-slate-700"><span className="mb-2 block font-semibold">Service interested</span><input value={form.service} onChange={(e) => setForm({ ...form, service: e.target.value })} className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Boardroom, sound, CCTV, maintenance..." /></label>
-              <label className="mt-5 block text-sm text-slate-700"><span className="mb-2 block font-semibold">Message</span><textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="min-h-36 w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Tell us about your project" /></label>
-              <div className="mt-6 flex items-center gap-4">
-                <button type="submit" disabled={loading} className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#105cda]">
-                  {loading ? "Sending…" : "Send enquiry"} <ArrowRight size={18} />
-                </button>
-                {status && (
-                  <div className={`text-sm ${status.ok ? "text-green-600" : "text-red-600"}`}>{status.message}</div>
-                )}
-              </div>
+              <label className="mt-5 block text-sm text-slate-700"><span className="mb-2 block font-semibold">Service interested</span><input className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Boardroom, sound, CCTV, maintenance..." /></label>
+              <label className="mt-5 block text-sm text-slate-700"><span className="mb-2 block font-semibold">Budget</span><input className="w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Estimated budget" /></label>
+              <label className="mt-5 block text-sm text-slate-700"><span className="mb-2 block font-semibold">Message</span><textarea className="min-h-36 w-full rounded-2xl border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-slate-900" placeholder="Tell us about your project" /></label>
+              <button className="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#105cda]">Send enquiry <ArrowRight size={18} /></button>
             </form>
           </div>
         </div>

@@ -80,7 +80,18 @@ export default function DiagnosisQuoteForm({
       const response = await fetch(`/api/admin/repairs/${encodeURIComponent(ticketId)}/quote`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ findings, recommendedAction, currency, additionalCharges, items }),
+        body: JSON.stringify({
+          findings,
+          recommendedAction,
+          currency,
+          additionalCharges,
+          items: items.map(({ itemType, description, quantity, unitAmount }) => ({
+            itemType,
+            description,
+            quantity,
+            unitAmount,
+          })),
+        }),
       });
       const result = (await response.json().catch(() => null)) as {
         message?: string;

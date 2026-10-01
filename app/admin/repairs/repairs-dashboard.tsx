@@ -6,9 +6,11 @@ import { Eye, Search } from "lucide-react";
 import DiagnosisQuoteForm from "./diagnosis-quote-form";
 import {
   getAllowedRepairStatusTransitions,
+  repairPaymentMethods,
   repairStatusLabels,
   repairStatusOrder,
   type AdminRepairTicket,
+  type RepairPaymentMethod,
   type RepairStatus,
 } from "@/lib/repairs/types";
 
@@ -71,7 +73,77 @@ function StatusBadge({ status }: { status: RepairStatus }) {
   );
 }
 
-function TicketDetails({ ticket }: { ticket: AdminRepairTicket }) {
+function TicketDetails({ ticket, onPaymentRecorded }: {
+  ticket: AdminRepairTicket;
+  onPaymentRecorded: (message: string) => void;
+}) {
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<RepairPaymentMethod>("CASH");
+  const [paymentReference, setPaymentReference] = useState("");
+  const [paymentNote, setPaymentNote] = useState("");
+  const [paymentError, setPaymentError] = useState("");
+  const [isRecordingPayment, setIsRecordingPayment] = useState(false);
+  const [confirmingSubmissionId, setConfirmingSubmissionId] = useState<string | null>(null);
+
+  async function submitPayment(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!ticket.paymentSummary || isRecordingPayment) return;
+
+    setIsRecordingPayment(true);
+    setPaymentError("");
+    try {
+      const response = await fetch(`/api/admin/repairs/${encodeURIComponent(ticket.id)}/payments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: paymentAmount,
+          paymentMethod,
+          referenceNumber: paymentReference,
+          notes: paymentNote,
+        }),
+      });
+      const result = (await response.json().catch(() => null)) as { message?: string } | null;
+      if (!response.ok) {
+        throw new Error(result?.message ?? "Payment could not be recorded.");
+      }
+      onPaymentRecorded(`Payment recorded for ${ticket.ticketNumber}.`);
+      setPaymentAmount("");
+      setPaymentReference("");
+      setPaymentNote("");
+    } catch (error) {
+      setPaymentError(error instanceof Error ? error.message : "Payment could not be recorded.");
+    } finally {
+      setIsRecordingPayment(false);
+    }
+  }
+
+  async function confirmSubmittedPayment(submissionId: string) {
+    if (confirmingSubmissionId) return;
+    setConfirmingSubmissionId(submissionId);
+    setPaymentError("");
+    try {
+      const response = await fetch(`/api/admin/repairs/${encodeURIComponent(ticket.id)}/payments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ submissionId }),
+      });
+      const result = (await response.json().catch(() => null)) as { message?: string } | null;
+      if (!response.ok) {
+        throw new Error(result?.message ?? "Payment could not be confirmed.");
+      }
+      onPaymentRecorded(`Customer payment confirmed for ${ticket.ticketNumber}.`);
+    } catch (error) {
+      setPaymentError(error instanceof Error ? error.message : "Payment could not be confirmed.");
+    } finally {
+      setConfirmingSubmissionId(null);
+    }
+  }
+
+  const paymentSummary = ticket.paymentSummary;
+  const paymentCurrency = paymentSummary?.currency ?? "KES";
+  const paidInFull = paymentSummary !== null && Number(paymentSummary.outstandingBalance) === 0;
+  const paymentClosed = ticket.status === "COMPLETED" || ticket.status === "CANCELLED" || paymentSummary?.collectionStatus === "COLLECTED";
+
   return (
     <div className="space-y-5 border-t border-slate-200 bg-slate-50 p-5">
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -93,6 +165,89 @@ function TicketDetails({ ticket }: { ticket: AdminRepairTicket }) {
           <p className="mt-1 text-sm text-slate-600">Updated {formatDate(ticket.updatedAt, true)}</p>
         </div>
       </div>
+
+      {paymentSummary ? (
+        <section className="border-t border-slate-200 pt-5" aria-label="Repair payment summary and history">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold text-slate-900">Payment Summary</h3>
+            {paidInFull ? <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">PAID IN FULL</span> : null}
+          </div>
+          <dl className="mt-3 grid gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm sm:grid-cols-3">
+            <div><dt className="text-slate-500">Approved amount</dt><dd className="mt-1 font-semibold text-slate-900">{new Intl.NumberFormat(undefined, { style: "currency", currency: paymentCurrency }).format(Number(paymentSummary.approvedAmount))}</dd></div>
+            <div><dt className="text-slate-500">Paid</dt><dd className="mt-1 font-semibold text-slate-900">{new Intl.NumberFormat(undefined, { style: "currency", currency: paymentCurrency }).format(Number(paymentSummary.amountPaid))}</dd></div>
+            <div><dt className="text-slate-500">Outstanding</dt><dd className="mt-1 font-semibold text-slate-900">{new Intl.NumberFormat(undefined, { style: "currency", currency: paymentCurrency }).format(Number(paymentSummary.outstandingBalance))}</dd></div>
+          </dl>
+
+          {paymentClosed ? (
+            <p className="mt-3 text-sm text-slate-600">No additional payment can be recorded for this repair.</p>
+          ) : !paidInFull ? (
+            <form onSubmit={submitPayment} className="mt-4 grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2">
+              <h4 className="text-sm font-semibold text-slate-900 sm:col-span-2">Record Payment</h4>
+              <label className="text-xs font-medium text-slate-600">Amount
+                <input type="number" min="0.01" max={paymentSummary.outstandingBalance} step="0.01" required value={paymentAmount} onChange={(event) => setPaymentAmount(event.target.value)} disabled={isRecordingPayment} className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900" />
+              </label>
+              <label className="text-xs font-medium text-slate-600">Payment method
+                <select value={paymentMethod} onChange={(event) => setPaymentMethod(event.target.value as RepairPaymentMethod)} disabled={isRecordingPayment} className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900">
+                  {repairPaymentMethods.map((method) => <option key={method} value={method}>{method.replaceAll("_", " ")}</option>)}
+                </select>
+              </label>
+              <label className="text-xs font-medium text-slate-600">Reference (optional)
+                <input maxLength={160} value={paymentReference} onChange={(event) => setPaymentReference(event.target.value)} disabled={isRecordingPayment} className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900" />
+              </label>
+              <label className="text-xs font-medium text-slate-600">Note (optional)
+                <input maxLength={2000} value={paymentNote} onChange={(event) => setPaymentNote(event.target.value)} disabled={isRecordingPayment} className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900" />
+              </label>
+              {paymentError ? <p role="alert" className="text-sm text-rose-700 sm:col-span-2">{paymentError}</p> : null}
+              <button type="submit" disabled={isRecordingPayment} className="rounded-lg bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-800 disabled:cursor-wait disabled:opacity-60 sm:col-span-2">
+                {isRecordingPayment ? "Recording..." : "Record Payment"}
+              </button>
+            </form>
+          ) : null}
+
+          {ticket.pendingPaymentSubmissions.length > 0 ? (
+            <div className="mt-5">
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Customer payment submissions</h4>
+              <ul className="mt-3 divide-y divide-amber-200 rounded-xl border border-amber-200 bg-amber-50">
+                {ticket.pendingPaymentSubmissions.map((submission, index) => (
+                  <li key={`${submission.submittedAt}-${index}`} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="text-sm">
+                      <p className="font-semibold text-slate-900">
+                        {new Intl.NumberFormat(undefined, { style: "currency", currency: paymentCurrency }).format(Number(submission.amount))} · {submission.paymentMethod.replaceAll("_", " ")}
+                        <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">Awaiting confirmation</span>
+                      </p>
+                      <p className="mt-1 text-xs text-slate-600">Submitted {formatDate(submission.submittedAt, true)}{submission.referenceNumber ? ` · Ref ${submission.referenceNumber}` : ""}</p>
+                      {submission.customerMessage ? <p className="mt-2 text-slate-700">{submission.customerMessage}</p> : null}
+                    </div>
+                    {!paymentClosed ? (
+                      <button type="button" onClick={() => void confirmSubmittedPayment(submission.submissionId)} disabled={confirmingSubmissionId !== null || isRecordingPayment} className="shrink-0 rounded-lg bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:cursor-wait disabled:opacity-60">
+                        {confirmingSubmissionId === submission.submissionId ? "Confirming..." : "Payment Received"}
+                      </button>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+              {paymentError ? <p role="alert" className="mt-2 text-sm text-rose-700">{paymentError}</p> : null}
+            </div>
+          ) : null}
+
+          <div className="mt-5">
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Payment history</h4>
+            {ticket.payments.length ? (
+              <ul className="mt-3 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
+                {ticket.payments.map((payment, index) => (
+                  <li key={`${payment.paymentDate}-${index}`} className="grid gap-2 p-4 text-sm sm:grid-cols-[minmax(0,1fr)_auto]">
+                    <div>
+                      <p className="font-semibold text-slate-900">{new Intl.NumberFormat(undefined, { style: "currency", currency: paymentCurrency }).format(Number(payment.amount))} · {payment.paymentMethod.replaceAll("_", " ")}</p>
+                      <p className="mt-1 text-xs text-slate-600">{formatDate(payment.paymentDate, true)}{payment.referenceNumber ? ` · Ref ${payment.referenceNumber}` : ""}</p>
+                      {payment.recordedByEmail ? <p className="mt-1 text-xs text-slate-500">Recorded by {payment.recordedByEmail}</p> : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : <p className="mt-2 text-sm text-slate-500">No payments recorded.</p>}
+          </div>
+        </section>
+      ) : null}
 
       <section className="border-t border-slate-200 pt-5" aria-label="Customer-visible status timeline">
         <h3 className="text-sm font-semibold text-slate-900">Status timeline</h3>
@@ -223,6 +378,11 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
     setSuccessMessage(message);
     setExpandedTicketId(diagnosisTicket?.id ?? null);
     setDiagnosisTicket(null);
+    setReloadKey((value) => value + 1);
+  }
+
+  function handlePaymentRecorded(message: string) {
+    setSuccessMessage(message);
     setReloadKey((value) => value + 1);
   }
 
@@ -375,7 +535,7 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
                                   </button>
                                 </td>
                               </tr>
-                              {isExpanded ? <tr key={`${ticket.id}-details`}><td colSpan={8} className="p-0"><TicketDetails ticket={ticket} /></td></tr> : null}
+                              {isExpanded ? <tr key={`${ticket.id}-details`}><td colSpan={8} className="p-0"><TicketDetails ticket={ticket} onPaymentRecorded={handlePaymentRecorded} /></td></tr> : null}
                             </Fragment>
                           );
                         })}
@@ -418,7 +578,7 @@ export default function AdminRepairsDashboard({ adminEmail }: { adminEmail: stri
                             ) : <span className="self-center text-xs text-slate-500">Final status</span>}
                           </div>
                         </div>
-                        {isExpanded ? <TicketDetails ticket={ticket} /> : null}
+                        {isExpanded ? <TicketDetails ticket={ticket} onPaymentRecorded={handlePaymentRecorded} /> : null}
                       </article>
                     );
                   })}

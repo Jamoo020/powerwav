@@ -8,9 +8,6 @@ export default function BlogPage() {
     <div className="bg-slate-50 text-slate-900">
       <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
         <SectionHeading eyebrow="Blog" title="Practical insights for modern AV planning" description="Explore guides and ideas that help businesses make better decisions around rooms, sound, security, and experience design." />
-        <div className="mt-6 max-w-3xl text-base leading-8 text-slate-600">
-          <p>These articles share practical AV planning advice for boardrooms, hospitality venues, and visitor-facing spaces. Each post is written to help you make confident choices without getting lost in technical detail.</p>
-        </div>
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {blogPosts.map((post) => (
             <article key={post.slug} className="overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-white shadow-sm">

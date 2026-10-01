@@ -7,13 +7,18 @@ import {
   getAllowedRepairStatusTransitions,
   repairQuoteCurrencies,
   repairQuoteItemTypes,
+  repairPaymentMethods,
   repairStatusLabels,
   type AdminRepairTicket,
+  type AdminRepairPayment,
+  type AdminRepairPaymentSummary,
+  type AdminRepairPaymentSubmission,
   type AdminRepairTimelineEntry,
   type CreateRepairTicketInput,
   type CreatedRepairTicket,
   type RepairQuoteCurrency,
   type RepairQuoteItemType,
+  type RepairPaymentMethod,
   type RepairStatus,
 } from "./types";
 
@@ -307,6 +312,35 @@ type AdminRepairTimelineRow = {
   created_at: Date;
 };
 
+type AdminRepairPaymentPlanRow = {
+  payment_plan_id: string;
+  ticket_id: string;
+  approved_amount: string;
+  currency: string;
+  amount_paid: string;
+  outstanding_balance: string;
+  collection_status: AdminRepairPaymentSummary["collectionStatus"];
+};
+
+type AdminRepairPaymentRow = {
+  ticket_id: string;
+  amount: string;
+  payment_method: RepairPaymentMethod;
+  reference_number: string | null;
+  payment_date: Date;
+  recorded_by_email: string | null;
+};
+
+type AdminRepairPaymentSubmissionRow = {
+  submission_id: string;
+  ticket_id: string;
+  amount: string;
+  payment_method: RepairPaymentMethod;
+  reference_number: string | null;
+  customer_message: string | null;
+  submitted_at: Date;
+};
+
 export type AdminRepairStatusCounts = Partial<Record<RepairStatus, number>>;
 
 export async function listAdminRepairTickets(filters: {
@@ -404,6 +438,98 @@ export async function listAdminRepairTickets(filters: {
     timelines.set(row.ticket_id, entries);
   }
 
+  const paymentPlanResult = ticketIds.length
+    ? await pool.query<AdminRepairPaymentPlanRow>(
+        `SELECT DISTINCT ON (p.ticket_id)
+                p.id AS payment_plan_id,
+                p.ticket_id,
+                q.total::text AS approved_amount,
+                q.currency,
+                b.amount_paid::text AS amount_paid,
+                b.outstanding_balance::text AS outstanding_balance,
+                p.collection_status
+         FROM repair_payment_plans p
+         JOIN repair_quotes q ON q.id = p.quote_id AND q.ticket_id = p.ticket_id
+         JOIN repair_payment_balances b ON b.payment_plan_id = p.id
+         WHERE p.ticket_id = ANY($1::uuid[])
+           AND q.status = 'APPROVED'
+         ORDER BY p.ticket_id, p.created_at DESC, q.version DESC`,
+        [ticketIds],
+      )
+    : { rows: [] as AdminRepairPaymentPlanRow[] };
+  const paymentPlanIds = paymentPlanResult.rows.map((row) => row.payment_plan_id);
+  const paymentSummaries = new Map<string, AdminRepairPaymentSummary>();
+  for (const row of paymentPlanResult.rows) {
+    paymentSummaries.set(row.ticket_id, {
+      approvedAmount: row.approved_amount,
+      currency: row.currency,
+      amountPaid: row.amount_paid,
+      outstandingBalance: row.outstanding_balance,
+      collectionStatus: row.collection_status,
+    });
+  }
+
+  const paymentHistoryResult = paymentPlanIds.length
+    ? await pool.query<AdminRepairPaymentRow>(
+        `SELECT s.id AS submission_id,
+          p.ticket_id,
+                tx.amount::text AS amount,
+                tx.payment_method,
+                tx.reference_number,
+                tx.payment_date,
+                u.email AS recorded_by_email
+         FROM repair_payment_transactions tx
+         JOIN repair_payment_plans p ON p.id = tx.payment_plan_id
+         LEFT JOIN admin_users u ON u.id = tx.recorded_by_admin_user_id
+         WHERE tx.payment_plan_id = ANY($1::uuid[])
+         ORDER BY tx.payment_date DESC, tx.created_at DESC`,
+        [paymentPlanIds],
+      )
+    : { rows: [] as AdminRepairPaymentRow[] };
+  const paymentsByTicket = new Map<string, AdminRepairPayment[]>();
+  for (const row of paymentHistoryResult.rows) {
+    const payment: AdminRepairPayment = {
+      amount: row.amount,
+      paymentMethod: row.payment_method,
+      referenceNumber: row.reference_number,
+      paymentDate: row.payment_date.toISOString(),
+      recordedByEmail: row.recorded_by_email,
+    };
+    const payments = paymentsByTicket.get(row.ticket_id) ?? [];
+    payments.push(payment);
+    paymentsByTicket.set(row.ticket_id, payments);
+  }
+
+  const pendingSubmissionResult = paymentPlanIds.length
+    ? await pool.query<AdminRepairPaymentSubmissionRow>(
+        `SELECT p.ticket_id,
+                s.amount::text AS amount,
+                s.payment_method,
+                s.reference_number,
+                s.customer_message,
+                s.submitted_at
+         FROM repair_payment_submissions s
+         JOIN repair_payment_plans p ON p.id = s.payment_plan_id
+         WHERE s.payment_plan_id = ANY($1::uuid[])
+           AND s.status = 'PENDING_ADMIN_CONFIRMATION'
+         ORDER BY s.submitted_at DESC`,
+        [paymentPlanIds],
+      )
+    : { rows: [] as AdminRepairPaymentSubmissionRow[] };
+  const pendingSubmissionsByTicket = new Map<string, AdminRepairPaymentSubmission[]>();
+  for (const row of pendingSubmissionResult.rows) {
+    const submissions = pendingSubmissionsByTicket.get(row.ticket_id) ?? [];
+    submissions.push({
+      submissionId: row.submission_id,
+      amount: row.amount,
+      paymentMethod: row.payment_method,
+      referenceNumber: row.reference_number,
+      customerMessage: row.customer_message,
+      submittedAt: row.submitted_at.toISOString(),
+    });
+    pendingSubmissionsByTicket.set(row.ticket_id, submissions);
+  }
+
   return {
     tickets: ticketsResult.rows.map((row) => ({
       id: row.id,
@@ -433,6 +559,9 @@ export async function listAdminRepairTickets(filters: {
             recommendedAction: row.diagnosis_recommended_action,
           }
         : null,
+        paymentSummary: paymentSummaries.get(row.id) ?? null,
+        payments: paymentsByTicket.get(row.id) ?? [],
+        pendingPaymentSubmissions: pendingSubmissionsByTicket.get(row.id) ?? [],
     })),
     statusCounts,
   };
@@ -1004,6 +1133,419 @@ export async function issueRepairQuote(input: {
       throw error;
     }
     throw new RepairWorkflowPersistenceError();
+  } finally {
+    client?.release();
+  }
+}
+
+export class RepairPaymentError extends Error {
+  constructor(message: string, readonly statusCode: 400 | 404 | 409) {
+    super(message);
+    this.name = "RepairPaymentError";
+  }
+}
+
+export class RepairPaymentPersistenceError extends Error {
+  constructor() {
+    super("Payment could not be recorded.");
+    this.name = "RepairPaymentPersistenceError";
+  }
+}
+
+export type RepairPaymentInput = {
+  amount: string;
+  amountMinor: bigint;
+  paymentMethod: RepairPaymentMethod;
+  referenceNumber: string | null;
+  notes: string | null;
+};
+
+export function validateRepairPaymentInput(payload: unknown): RepairPaymentInput {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    throw new RepairPaymentError("Request body must be an object.", 400);
+  }
+  const data = payload as Record<string, unknown>;
+  const allowedFields = new Set(["amount", "paymentMethod", "referenceNumber", "notes"]);
+  if (Object.keys(data).some((key) => !allowedFields.has(key))) {
+    throw new RepairPaymentError("Request contains unsupported fields.", 400);
+  }
+
+  if (typeof data.amount !== "number" && typeof data.amount !== "string") {
+    throw new RepairPaymentError("Payment amount must be positive with at most two decimal places.", 400);
+  }
+  const match = String(data.amount).trim().match(/^(0|[1-9]\d*)(?:\.(\d{1,2}))?$/);
+  if (!match || match[1].length > 10) {
+    throw new RepairPaymentError("Payment amount must be positive with at most two decimal places.", 400);
+  }
+  const fraction = (match[2] ?? "").padEnd(2, "0");
+  const amountMinor = BigInt(match[1]) * BigInt(100) + BigInt(fraction);
+  if (amountMinor <= BigInt(0)) {
+    throw new RepairPaymentError("Payment amount must be greater than zero.", 400);
+  }
+  if (typeof data.paymentMethod !== "string" || !repairPaymentMethods.some((method) => method === data.paymentMethod)) {
+    throw new RepairPaymentError("Payment method is invalid.", 400);
+  }
+
+  let referenceNumber: string | null = null;
+  if (data.referenceNumber !== undefined && data.referenceNumber !== null) {
+    if (typeof data.referenceNumber !== "string") {
+      throw new RepairPaymentError("Payment reference must be text.", 400);
+    }
+    referenceNumber = data.referenceNumber.trim() || null;
+    if (referenceNumber && (referenceNumber.length > 160 || referenceNumber.includes("\0"))) {
+      throw new RepairPaymentError("Payment reference is invalid.", 400);
+    }
+  }
+
+  let notes: string | null = null;
+  if (data.notes !== undefined && data.notes !== null) {
+    if (typeof data.notes !== "string") {
+      throw new RepairPaymentError("Payment note must be text.", 400);
+    }
+    notes = data.notes.trim() || null;
+    if (notes && (notes.length > 2000 || notes.includes("\0"))) {
+      throw new RepairPaymentError("Payment note is invalid.", 400);
+    }
+  }
+
+  return {
+    amount: `${match[1]}.${fraction}`,
+    amountMinor,
+    paymentMethod: data.paymentMethod as RepairPaymentMethod,
+    referenceNumber,
+    notes,
+  };
+}
+
+function databaseMoneyToMinorUnits(value: string): bigint {
+  const match = value.match(/^(0|[1-9]\d*)(?:\.(\d{1,2}))?$/);
+  if (!match) {
+    throw new RepairPaymentPersistenceError();
+  }
+  return BigInt(match[1]) * BigInt(100) + BigInt((match[2] ?? "").padEnd(2, "0"));
+}
+
+function formatPaymentTimelineMoney(currency: string, amountMinor: bigint): string {
+  const whole = amountMinor / BigInt(100);
+  const fraction = amountMinor % BigInt(100);
+  const formattedWhole = new Intl.NumberFormat("en-KE", { maximumFractionDigits: 0 }).format(whole);
+  return `${currency} ${formattedWhole}${fraction === BigInt(0) ? "" : `.${String(fraction).padStart(2, "0")}`}`;
+}
+
+export async function recordRepairPayment(input: {
+  ticketId: string;
+  adminUserId: string;
+  payload: unknown;
+}): Promise<{
+  amount: string;
+  currency: string;
+  amountPaid: string;
+  outstandingBalance: string;
+  paidInFull: boolean;
+}> {
+  const payment = validateRepairPaymentInput(input.payload);
+  let client: PoolClient | undefined;
+  let transactionOpen = false;
+
+  try {
+    client = await pool.connect();
+    await client.query("BEGIN");
+    transactionOpen = true;
+
+    const ticketResult = await client.query<{ status: RepairStatus }>(
+      "SELECT status FROM repair_tickets WHERE id = $1 FOR UPDATE",
+      [input.ticketId],
+    );
+    const ticket = ticketResult.rows[0];
+    if (!ticket) {
+      throw new RepairPaymentError("Repair ticket not found.", 404);
+    }
+    if (["COMPLETED", "CANCELLED"].includes(ticket.status)) {
+      throw new RepairPaymentError("Payments cannot be recorded after the repair is completed or cancelled.", 409);
+    }
+
+    const planResult = await client.query<{ id: string; quote_id: string; collection_status: string }>(
+      `SELECT p.id, p.quote_id, p.collection_status
+       FROM repair_payment_plans p
+       WHERE p.ticket_id = $1
+       ORDER BY p.created_at DESC
+       LIMIT 1
+       FOR UPDATE`,
+      [input.ticketId],
+    );
+    const plan = planResult.rows[0];
+    if (!plan) {
+      throw new RepairPaymentError("No approved payment plan exists for this repair.", 409);
+    }
+    if (plan.collection_status === "COLLECTED") {
+      throw new RepairPaymentError("Payments cannot be recorded after the repair has been collected.", 409);
+    }
+
+    const quoteResult = await client.query<{ status: string; currency: string }>(
+      `SELECT status, currency
+       FROM repair_quotes
+       WHERE id = $1 AND ticket_id = $2`,
+      [plan.quote_id, input.ticketId],
+    );
+    const quote = quoteResult.rows[0];
+    if (!quote || quote.status !== "APPROVED") {
+      throw new RepairPaymentError("Payments require an approved quote for this repair.", 409);
+    }
+
+    const balanceResult = await client.query<{ approved_amount: string; amount_paid: string; outstanding_balance: string }>(
+      `SELECT approved_amount::text AS approved_amount,
+              amount_paid::text AS amount_paid,
+              outstanding_balance::text AS outstanding_balance
+       FROM repair_payment_balances
+       WHERE payment_plan_id = $1`,
+      [plan.id],
+    );
+    const currentBalance = balanceResult.rows[0];
+    if (!currentBalance) {
+      throw new RepairPaymentError("Payment balance is unavailable for this repair.", 409);
+    }
+
+    const outstandingMinor = databaseMoneyToMinorUnits(currentBalance.outstanding_balance);
+    if (payment.amountMinor > outstandingMinor) {
+      throw new RepairPaymentError("Payment cannot exceed the current outstanding balance.", 409);
+    }
+
+    try {
+      await client.query(
+        `INSERT INTO repair_payment_transactions (
+           ticket_id,
+           payment_plan_id,
+           amount,
+           payment_method,
+           reference_number,
+           payment_date,
+           recorded_by_admin_user_id,
+           notes
+         ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7)`,
+        [input.ticketId, plan.id, payment.amount, payment.paymentMethod, payment.referenceNumber, input.adminUserId, payment.notes],
+      );
+    } catch (error) {
+      if (error && typeof error === "object" && "code" in error && error.code === "23505") {
+        throw new RepairPaymentError("That payment reference has already been recorded.", 409);
+      }
+      throw error;
+    }
+
+    const updatedBalanceResult = await client.query<{ amount_paid: string; outstanding_balance: string }>(
+      `SELECT amount_paid::text AS amount_paid,
+              outstanding_balance::text AS outstanding_balance
+       FROM repair_payment_balances
+       WHERE payment_plan_id = $1`,
+      [plan.id],
+    );
+    const updatedBalance = updatedBalanceResult.rows[0];
+    if (!updatedBalance) {
+      throw new RepairPaymentPersistenceError();
+    }
+    const updatedOutstandingMinor = databaseMoneyToMinorUnits(updatedBalance.outstanding_balance);
+    const paidInFull = updatedOutstandingMinor === BigInt(0);
+    const customerUpdate = paidInFull
+      ? "Your repair payment has been received in full."
+      : `A payment of ${formatPaymentTimelineMoney(quote.currency, payment.amountMinor)} has been received. Your outstanding balance is ${formatPaymentTimelineMoney(quote.currency, updatedOutstandingMinor)}.`;
+
+    await client.query(
+      `INSERT INTO repair_timeline_events (
+         ticket_id,
+         event_type,
+         from_status,
+         to_status,
+         customer_update,
+         internal_note,
+         actor_type,
+         actor_admin_user_id,
+         created_at
+       ) VALUES ($1, 'PAYMENT_RECEIVED', $2, $2, $3, NULL, 'ADMIN', $4, NOW())`,
+      [input.ticketId, ticket.status, customerUpdate, input.adminUserId],
+    );
+
+    await client.query("COMMIT");
+    transactionOpen = false;
+    return {
+      amount: payment.amount,
+      currency: quote.currency,
+      amountPaid: updatedBalance.amount_paid,
+      outstandingBalance: updatedBalance.outstanding_balance,
+      paidInFull,
+    };
+  } catch (error) {
+    if (transactionOpen && client) {
+      try {
+        await client.query("ROLLBACK");
+      } catch {
+        // Preserve the original payment error.
+      }
+    }
+    if (error instanceof RepairPaymentError || error instanceof RepairPaymentPersistenceError) {
+      throw error;
+    }
+    throw new RepairPaymentPersistenceError();
+  } finally {
+    client?.release();
+  }
+}
+
+export async function confirmRepairPaymentSubmission(input: {
+  ticketId: string;
+  submissionId: string;
+  adminUserId: string;
+}): Promise<{
+  amount: string;
+  currency: string;
+  amountPaid: string;
+  outstandingBalance: string;
+  paidInFull: boolean;
+}> {
+  let client: PoolClient | undefined;
+  let transactionOpen = false;
+
+  try {
+    client = await pool.connect();
+    await client.query("BEGIN");
+    transactionOpen = true;
+
+    const ticketResult = await client.query<{ status: RepairStatus }>(
+      "SELECT status FROM repair_tickets WHERE id = $1 FOR UPDATE",
+      [input.ticketId],
+    );
+    const ticket = ticketResult.rows[0];
+    if (!ticket) throw new RepairPaymentError("Repair ticket not found.", 404);
+    if (["COMPLETED", "CANCELLED"].includes(ticket.status)) {
+      throw new RepairPaymentError("Payments cannot be confirmed after the repair is completed or cancelled.", 409);
+    }
+
+    const planResult = await client.query<{ id: string; quote_id: string; collection_status: string }>(
+      `SELECT id, quote_id, collection_status
+       FROM repair_payment_plans
+       WHERE ticket_id = $1
+       ORDER BY created_at DESC
+       LIMIT 1
+       FOR UPDATE`,
+      [input.ticketId],
+    );
+    const plan = planResult.rows[0];
+    if (!plan) throw new RepairPaymentError("No approved payment plan exists for this repair.", 409);
+    if (plan.collection_status === "COLLECTED") {
+      throw new RepairPaymentError("Payments cannot be confirmed after the repair has been collected.", 409);
+    }
+
+    const submissionResult = await client.query<{
+      amount: string;
+      payment_method: RepairPaymentMethod;
+      reference_number: string;
+      customer_message: string | null;
+    }>(
+      `SELECT amount::text AS amount, payment_method, reference_number, customer_message
+       FROM repair_payment_submissions
+       WHERE id = $1 AND ticket_id = $2 AND payment_plan_id = $3
+         AND status = 'PENDING_ADMIN_CONFIRMATION'
+       FOR UPDATE`,
+      [input.submissionId, input.ticketId, plan.id],
+    );
+    const submission = submissionResult.rows[0];
+    if (!submission) {
+      throw new RepairPaymentError("Payment submission was not found or has already been reviewed.", 409);
+    }
+
+    const quoteResult = await client.query<{ status: string; currency: string }>(
+      "SELECT status, currency FROM repair_quotes WHERE id = $1 AND ticket_id = $2",
+      [plan.quote_id, input.ticketId],
+    );
+    const quote = quoteResult.rows[0];
+    if (!quote || quote.status !== "APPROVED") {
+      throw new RepairPaymentError("Payments require an approved quote for this repair.", 409);
+    }
+
+    const payment = validateRepairPaymentInput({
+      amount: submission.amount,
+      paymentMethod: submission.payment_method,
+      referenceNumber: submission.reference_number,
+      notes: submission.customer_message,
+    });
+    const balanceResult = await client.query<{ outstanding_balance: string }>(
+      `SELECT outstanding_balance::text AS outstanding_balance
+       FROM repair_payment_balances
+       WHERE payment_plan_id = $1`,
+      [plan.id],
+    );
+    const outstanding = balanceResult.rows[0]?.outstanding_balance;
+    if (outstanding === undefined || payment.amountMinor > databaseMoneyToMinorUnits(outstanding)) {
+      throw new RepairPaymentError("Payment submission exceeds the current outstanding balance.", 409);
+    }
+
+    let transactionId: string;
+    try {
+      const transactionResult = await client.query<{ id: string }>(
+        `INSERT INTO repair_payment_transactions (
+           ticket_id, payment_plan_id, amount, payment_method,
+           reference_number, payment_date, recorded_by_admin_user_id, notes
+         ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7)
+         RETURNING id`,
+        [input.ticketId, plan.id, payment.amount, payment.paymentMethod, payment.referenceNumber, input.adminUserId, payment.notes],
+      );
+      transactionId = transactionResult.rows[0].id;
+    } catch (error) {
+      if (error && typeof error === "object" && "code" in error && error.code === "23505") {
+        throw new RepairPaymentError("That payment reference has already been recorded.", 409);
+      }
+      throw error;
+    }
+
+    const updatedBalanceResult = await client.query<{ amount_paid: string; outstanding_balance: string }>(
+      `SELECT amount_paid::text AS amount_paid, outstanding_balance::text AS outstanding_balance
+       FROM repair_payment_balances WHERE payment_plan_id = $1`,
+      [plan.id],
+    );
+    const updatedBalance = updatedBalanceResult.rows[0];
+    if (!updatedBalance) throw new RepairPaymentPersistenceError();
+    const updatedOutstandingMinor = databaseMoneyToMinorUnits(updatedBalance.outstanding_balance);
+    const paidInFull = updatedOutstandingMinor === BigInt(0);
+    const customerUpdate = paidInFull
+      ? "Your repair payment has been received in full."
+      : `A payment of ${formatPaymentTimelineMoney(quote.currency, payment.amountMinor)} has been received. Your outstanding balance is ${formatPaymentTimelineMoney(quote.currency, updatedOutstandingMinor)}.`;
+
+    await client.query(
+      `UPDATE repair_payment_submissions
+       SET status = 'CONFIRMED',
+           reviewed_by_admin_user_id = $2,
+           reviewed_at = NOW(),
+           payment_transaction_id = $3
+       WHERE id = $1 AND status = 'PENDING_ADMIN_CONFIRMATION'`,
+      [input.submissionId, input.adminUserId, transactionId],
+    );
+    await client.query(
+      `INSERT INTO repair_timeline_events (
+         ticket_id, event_type, from_status, to_status, customer_update,
+         internal_note, actor_type, actor_admin_user_id, created_at
+       ) VALUES ($1, 'PAYMENT_RECEIVED', $2, $2, $3, NULL, 'ADMIN', $4, NOW())`,
+      [input.ticketId, ticket.status, customerUpdate, input.adminUserId],
+    );
+
+    await client.query("COMMIT");
+    transactionOpen = false;
+    return {
+      amount: payment.amount,
+      currency: quote.currency,
+      amountPaid: updatedBalance.amount_paid,
+      outstandingBalance: updatedBalance.outstanding_balance,
+      paidInFull,
+    };
+  } catch (error) {
+    if (transactionOpen && client) {
+      try {
+        await client.query("ROLLBACK");
+      } catch {
+        // Preserve the original payment confirmation error.
+      }
+    }
+    if (error instanceof RepairPaymentError || error instanceof RepairPaymentPersistenceError) {
+      throw error;
+    }
+    throw new RepairPaymentPersistenceError();
   } finally {
     client?.release();
   }
