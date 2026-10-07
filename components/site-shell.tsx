@@ -53,13 +53,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
       <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
-          <Link href="/" className="flex shrink-0 items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 sm:text-base">
+          <Link prefetch={false} href="/" className="flex shrink-0 items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 sm:text-base">
             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-lg">PW</span>
             PowerWave AV
           </Link>
           <nav aria-label="Primary navigation" className="hidden min-w-0 flex-1 items-center justify-center gap-1 text-[13px] text-slate-600 xl:flex 2xl:gap-2">
             {navLinks.map((link) => "href" in link ? (
-              <Link key={link.href} href={link.href} className="whitespace-nowrap rounded-md px-2 py-2 transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40">
+              <Link key={link.href} href={link.href} prefetch={false} className="whitespace-nowrap rounded-md px-2 py-2 transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40">
                 {link.label}
               </Link>
             ) : (
@@ -73,6 +73,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                     <Link
                       key={item.href}
                       href={item.href}
+                      prefetch={false}
                       onClick={() => {
                         if (desktopResourcesRef.current) desktopResourcesRef.current.open = false;
                       }}
@@ -107,7 +108,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <nav id="mobile-site-navigation" aria-label="Mobile navigation" onKeyDown={handleMobileMenuKeyDown} hidden={!mobileMenuOpen} className="w-full border-t border-[var(--color-border)] pt-3 xl:hidden">
             <div className="grid gap-1">
               {navLinks.map((link) => "href" in link ? (
-                <Link key={link.href} href={link.href} onClick={closeMobileMenu} className="rounded-md px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40">
+                <Link key={link.href} href={link.href} prefetch={false} onClick={closeMobileMenu} className="rounded-md px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40">
                   {link.label}
                 </Link>
               ) : (
@@ -118,7 +119,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                   </summary>
                   <div className="grid gap-1 pb-1 pl-4">
                     {link.children.map((item) => (
-                      <Link key={item.href} href={item.href} onClick={closeMobileMenu} className="rounded-md px-3 py-2.5 text-sm text-slate-600 transition hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40">
+                      <Link key={item.href} href={item.href} prefetch={false} onClick={closeMobileMenu} className="rounded-md px-3 py-2.5 text-sm text-slate-600 transition hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40">
                         {item.label}
                       </Link>
                     ))}
@@ -148,7 +149,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Services</h3>
             <ul className="mt-4 space-y-3 text-sm text-slate-600">
               {services.slice(0, 4).map((item) => (
-                <li key={item.title}><Link href={item.href} className="transition hover:text-slate-900">{item.title}</Link></li>
+                <li key={item.title}><Link href={item.href} prefetch={false} className="transition hover:text-slate-900">{item.title}</Link></li>
               ))}
             </ul>
           </div>
@@ -156,17 +157,17 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Industries</h3>
             <ul className="mt-4 space-y-3 text-sm text-slate-600">
               {industries.slice(0, 4).map((item) => (
-                <li key={item.name}><Link href={item.href} className="transition hover:text-slate-900">{item.name}</Link></li>
+                <li key={item.name}><Link href={item.href} prefetch={false} className="transition hover:text-slate-900">{item.name}</Link></li>
               ))}
             </ul>
           </div>
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">Resources</h3>
             <ul className="mt-4 space-y-3 text-sm text-slate-600">
-              <li><Link href="/blog" className="transition hover:text-slate-900">Insights & guides</Link></li>
-              <li><Link href="/faq" className="transition hover:text-slate-900">FAQ</Link></li>
-              <li><Link href="/contact" className="transition hover:text-slate-900">Contact</Link></li>
-              <li><Link href="/privacy-policy" className="transition hover:text-slate-900">Privacy Policy</Link></li>
+              <li><Link href="/blog" prefetch={false} className="transition hover:text-slate-900">Insights & guides</Link></li>
+              <li><Link href="/faq" prefetch={false} className="transition hover:text-slate-900">FAQ</Link></li>
+              <li><Link href="/contact" prefetch={false} className="transition hover:text-slate-900">Contact</Link></li>
+              <li><Link href="/privacy-policy" prefetch={false} className="transition hover:text-slate-900">Privacy Policy</Link></li>
             </ul>
           </div>
         </div>
@@ -174,8 +175,8 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <div className="mx-auto flex max-w-7xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <p>© 2026 PowerWave AV. All rights reserved.</p>
             <div className="flex gap-4">
-              <Link href="/terms" className="transition hover:text-slate-900">Terms</Link>
-              <Link href="/privacy-policy" className="transition hover:text-slate-900">Privacy</Link>
+              <Link href="/terms" prefetch={false} className="transition hover:text-slate-900">Terms</Link>
+              <Link href="/privacy-policy" prefetch={false} className="transition hover:text-slate-900">Privacy</Link>
               <a href="https://www.instagram.com/pow.e_r/" target="_blank" rel="noreferrer" className="transition hover:text-slate-900">Instagram</a>
             </div>
           </div>
