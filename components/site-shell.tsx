@@ -109,10 +109,10 @@ export function SiteShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex shrink-0 items-center gap-2">
-            <a href="tel:+254715825819" className="hidden rounded-full border border-[var(--color-border)] bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100 xl:inline-flex">
+            <a href="tel:+254116882307" className="hidden rounded-full border border-[var(--color-border)] bg-slate-50 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100 xl:inline-flex">
               Call Now
             </a>
-            <a href="https://wa.me/254715825819" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#105cda] sm:px-4">
+            <a href="https://wa.me/254116882307" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#105cda] sm:px-4">
               <MessageCircle size={16} /> <span className="hidden sm:inline">WhatsApp</span>
             </a>
             <button
@@ -163,7 +163,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
               Premium audio visual systems for businesses, hospitality venues, schools, churches, and public institutions across Kenya.
             </p>
             <div className="mt-6 flex flex-wrap gap-3 text-sm text-slate-600">
-              <a href="tel:+254715825819" className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-3 py-2 hover:bg-slate-50"><Phone size={16} /> 0715 825 819</a>
+              <a href="tel:+254116882307" className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-3 py-2 hover:bg-slate-50"><Phone size={16} /> 0116 882 307</a>
               <a href="mailto:info@powerwaveav.com" className="rounded-full border border-[var(--color-border)] bg-white px-3 py-2 hover:bg-slate-50">info@powerwaveav.com</a>
             </div>
           </div>

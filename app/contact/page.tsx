@@ -11,12 +11,12 @@ export default function ContactPage() {
           <div className="rounded-[2rem] border border-[var(--color-border)] bg-white p-10 shadow-sm">
             <h2 className="text-3xl font-semibold text-slate-950">Speak with our team</h2>
             <div className="mt-8 space-y-5 text-slate-700">
-              <p className="flex items-center gap-3 text-base"><Phone size={18} className="text-[var(--color-primary)]" /> 0715 825 819</p>
+              <p className="flex items-center gap-3 text-base"><Phone size={18} className="text-[var(--color-primary)]" /> 0116 882 307</p>
               <p className="flex items-center gap-3 text-base"><Mail size={18} className="text-[var(--color-primary)]" /> info@powerwaveav.com</p>
               <p className="flex items-center gap-3 text-base"><MapPin size={18} className="text-[var(--color-primary)]" /> Nairobi, Kenya</p>
             </div>
             <div className="mt-10 flex flex-wrap gap-4">
-              <a href="https://wa.me/254715825819" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#105cda]">
+              <a href="https://wa.me/254116882307" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#105cda]">
                 <MessageCircle size={18} /> WhatsApp us
               </a>
               <Link href="/faq" className="rounded-full border border-[var(--color-border)] px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100">View FAQ</Link>

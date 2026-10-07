@@ -28,7 +28,7 @@ export default function HomePage() {
               <Link href="/contact" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-[rgba(20,110,245,0.18)] transition hover:bg-[#105cda]">
                 Request Free Quote <ArrowRight size={18} />
               </Link>
-              <a href="tel:+254715825819" className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-7 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">
+              <a href="tel:+254116882307" className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-7 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">
                 <Phone size={18} /> Call Now
               </a>
               <Link href="/shop" className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-7 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">
@@ -204,7 +204,7 @@ export default function HomePage() {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link href="/contact" className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 font-semibold text-white shadow-lg shadow-[rgba(20,110,245,0.15)] hover:bg-[#105cda]">Request a quote <ArrowRight size={18} /></Link>
             <Link href="/repairs" className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-6 py-3 font-semibold text-slate-900 hover:bg-slate-100">Repair support <ArrowRight size={18} /></Link>
-            <a href="https://wa.me/254715825819" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-6 py-3 font-semibold text-slate-900 hover:bg-slate-100">
+            <a href="https://wa.me/254116882307" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-6 py-3 font-semibold text-slate-900 hover:bg-slate-100">
               <MessageCircle size={18} /> Start WhatsApp chat
             </a>
           </div>

@@ -266,7 +266,7 @@ export default async function ProductDetailPage({
 
               <div className="mt-8 space-y-3">
                 <a
-                  href={`https://wa.me/254715825819?text=${enquiryText}`}
+                  href={`https://wa.me/254116882307?text=${enquiryText}`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-sky-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-sky-500"

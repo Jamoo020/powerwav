@@ -188,8 +188,8 @@ export function VerticalSolutionPage({ slug }: VerticalSolutionPageProps) {
           <h2 className="text-2xl font-bold">Ready to get started?</h2>
           <p className="mt-3 text-blue-100">Connect with us for a no-pressure consultation.</p>
           <div className="mt-8">
-            <a href="tel:+254715825819" className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50">
-              Call 0715 825 819 <ArrowRight size={16} />
+            <a href="tel:+254116882307" className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50">
+              Call 0116 882 307 <ArrowRight size={16} />
             </a>
           </div>
         </div>
