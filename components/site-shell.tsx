@@ -93,7 +93,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 <div className="absolute left-0 top-full z-50 mt-2 min-w-52 rounded-lg border border-[var(--color-border)] bg-white p-1.5 shadow-lg">
                   {link.children.map((item) => (
                     <Link
-                      key={item.href}
+                      key={`${item.label}-${item.href}`}
                       href={item.href}
                       prefetch={false}
                       onClick={() => {
@@ -141,7 +141,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                   </summary>
                   <div className="grid gap-1 pb-1 pl-4">
                     {link.children.map((item) => (
-                      <Link key={item.href} href={item.href} prefetch={false} onClick={closeMobileMenu} className="rounded-md px-3 py-2.5 text-sm text-slate-600 transition hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40">
+                      <Link key={`${item.label}-${item.href}`} href={item.href} prefetch={false} onClick={closeMobileMenu} className="rounded-md px-3 py-2.5 text-sm text-slate-600 transition hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40">
                         {item.label}
                       </Link>
                     ))}
