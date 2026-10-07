@@ -7,23 +7,45 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { Phone, MessageCircle } from "@/components/icons";
 import { services, industries } from "@/lib/content";
 
-const resourceLinks = [
-  { label: "Case Studies", href: "/projects/case-studies" },
-  { label: "Buyer Guides", href: "/resources/buyer-guides" },
-  { label: "Blog", href: "/blog" },
-];
+type NavItem =
+  | { label: string; href: string; children?: never }
+  | { label: string; children: Array<{ label: string; href: string }>; href?: never };
 
-const navLinks = [
+const navigationItems: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
+  {
+    label: "Solutions",
+    children: [
+      { label: "Corporate / Boardrooms", href: "/services" },
+      { label: "Hotels & Restaurants", href: "/industries" },
+      { label: "Churches & Worship", href: "/industries" },
+      { label: "Education / Schools", href: "/industries" },
+      { label: "Industries", href: "/industries" },
+      { label: "Projects / Case Studies", href: "/projects/case-studies" },
+    ],
+  },
   { label: "Services", href: "/services" },
-  { label: "Industries", href: "/industries" },
-  { label: "Projects", href: "/projects" },
-  { label: "Resources", children: resourceLinks },
   { label: "Shop", href: "/shop" },
-  { label: "Repairs", href: "/repairs" },
+  {
+    label: "Resources",
+    children: [
+      { label: "Case Studies", href: "/projects/case-studies" },
+      { label: "Buyer Guides", href: "/resources/buyer-guides" },
+      { label: "Blog", href: "/blog" },
+    ],
+  },
+  {
+    label: "Support",
+    children: [
+      { label: "Book a Repair", href: "/repairs/book" },
+      { label: "Track a Repair", href: "/repairs/track" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Contact Support", href: "/contact" },
+    ],
+  },
   { label: "Contact", href: "/contact" },
-] as const;
+];
 
 export function SiteShell({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -58,7 +80,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             PowerWave AV
           </Link>
           <nav aria-label="Primary navigation" className="hidden min-w-0 flex-1 items-center justify-center gap-1 text-[13px] text-slate-600 xl:flex 2xl:gap-2">
-            {navLinks.map((link) => "href" in link ? (
+            {navigationItems.map((link) => typeof link.href === "string" ? (
               <Link key={link.href} href={link.href} prefetch={false} className="whitespace-nowrap rounded-md px-2 py-2 transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40">
                 {link.label}
               </Link>
@@ -107,7 +129,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </div>
           <nav id="mobile-site-navigation" aria-label="Mobile navigation" onKeyDown={handleMobileMenuKeyDown} hidden={!mobileMenuOpen} className="w-full border-t border-[var(--color-border)] pt-3 xl:hidden">
             <div className="grid gap-1">
-              {navLinks.map((link) => "href" in link ? (
+              {navigationItems.map((link) => typeof link.href === "string" ? (
                 <Link key={link.href} href={link.href} prefetch={false} onClick={closeMobileMenu} className="rounded-md px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/40">
                   {link.label}
                 </Link>
